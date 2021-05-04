@@ -1,0 +1,350 @@
+---
+title: "Statistical Genetics HW1"
+author: "Faizan Khalid Mohsin"
+date: "September 22, 2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Introduction
+
+
+We have a theoretical frame work where we know that pairing combinations of the 3 alleles (antigens: A, B, O) on the ABO-gene (ABO locus) found on chromosome 9, lead to four phenotypic manifestations in the form of 4 blood types: A, B, AB, O. 
+Now, there is an interest in estimating the frequency of the 3 alleles A, B, O in the population. One way to do this would be to take blood samples of a big sample of people from the population of interest and using DNA sequencing to determine the allele type (A or B or O) on the ABO-gene on chromosome 9. However, to get reliable frequency estimates one needs to do to DNA sequency for a large number of people, which will be extremely expensive and time consuming. 
+A more practical and more efficient method for estimating the 3 allele frequencies of a population would be to collect the phenotypic data, the blood type A, B, AB or O of people, which would be much more cheaper and easier to do at a large scale and using the theoretical framework to estimate the 3 allele frequencies in the population using the phenotypic blood type data.  
+In this paper we will layout the theoretical framework for estimating the allele frequency using phenotypic blood type data and use two separate algorithms and approaches for the estimation. Finally, we will use the actual blood type data gathered from a sample of 2114 people to demonstrate and estimate the allele frequency using the two algorithms.
+
+
+# Method
+
+We use two methods for approximating the allele frequencies: Expectation-Maximization method and Newton-Raphson method.
+
+In the ideal case we could sample n people and find out how many people possess allele A (nA), how many possess allele B (nB) and how many possess allele (nO). In such a case it would be very easy to calculate the allele frequency in the population: freq(A) = nA/n, freq(B) = nB/n, and freq(O) = nO/n. And we would be done. However, getting nA, nB, nO directly from DNA sequencing is very expensive and time consuming. It is much easier to collect the blood type of each individual from the sample of n people. This will give us a numeric count of how many people have each blood type, namely, n_A: number of people with blood type A, n_B: number of people with blood type B, n_AB: number of people with blood type AB and n_O: number of people with blood type O. 
+We use genetics to link the number of individuals with alleles nA, nB, and nO with number of people with phenotypes n_A, n_B, n_AB, and n_O (blood-type). 
+## Theoretical Framework. 
+### Genetical Theory
+From genetic theory we know that alleles A, B are dominant to allele O; alleles A, B are co-dominant; and allele O is recessive to alleles A, B. Using this below is a mapping from genotype to phenotype. 
+Genotype                 Phenotype
+ AA or AO      -             A
+BB or BO       -             B
+     AB             -            AB
+     OO            -            O
+
+### Statistical Theory:
+We have our log likelihood function:
+
+We can find the maxima’s of this by taking the first derivative, equating to zero and then solving for p and q. However, this is very difficult to do analytically. Hence, we will use two different algorithms and approaches to estimate p and q. Namely, the Estimation-Maximization algorithm and the Newton-Raphson algorithm.
+
+
+## Estimation-Maximization Algorithm Method
+
+One method to solving this is to think of the allele frequencies as latent variables or missing variables. In this approach we can cast the problem in the framework of EM algorithm. 
+
+To implement the EM algorithm we reframe the question in terms of a missing data problem. 
+
+## Newton-Raphson Algorithm Method
+
+The other method is a more direct method where we directly find the maxima’s of the loglikelihood function using numeric computational method called Newton-Raphson algorithm. 
+
+To approximate the values of $p\hat$ 
+
+
+We have the log-likelihood function 
+
+$$ln(L) \sim n_\text{a}\ln\left(p^2+2\left(-p q+1\right)p\right)+n_\text{ab}\ln\left(2qp\right)+2n_\text{o}\ln\left(-p-q+1\right)+n_\text{b}\ln\left(2q\left(-p-q+1\right)+q^2\right)
+$$
+
+Using the properties of log we can be simplified to the following: 
+
+$$ln(L) \sim n_\text{b}\ln\left(-q\left(2p+q-2\right)\right)+n_\text{a}\ln\left(-p\left(p+2q-2\right)\right)+n_\text{ab}\ln\left(2qp\right)+2n_\text{o}\ln\left(-p-q+1\right)
+$$
+
+n_B*ln(2*p+q-2) + n_B*ln(-q) + n_A*ln(p+2*q-2) + n_A*ln(-p) + n_AB*ln(p) + n_AB*ln(2*q) + 2*n_O*ln(-p-q+1)
+
+
+We need to get the full first derivative of this with respect to p and q. 
+
+We find that the derivative with respect to p is df/dp:
+
+$$ \frac{\partial f}{\partial p } = \dfrac{2n_\text{b}}{2p+q-2}+n_\text{a}\left(\dfrac{1}{p+2q-2}+\dfrac{1}{p}\right)+\dfrac{n_\text{ab}}{p}-\dfrac{2n_\text{o}}{-p-q+1}
+$$
+
+
+
+
+The first derivative with respect to q is df/dq:
+
+$$\frac{\partial f}{\partial q } = \dfrac{2n_\text{a}}{2q+p-2}+n_\text{b}\left(\dfrac{1}{q+2p-2}+\dfrac{1}{q}\right)+\dfrac{n_\text{ab}}{q}-\dfrac{2n_\text{o}}{-q-p+1}
+$$
+
+
+
+The second derivatives which are the components of the hessian are as follows:
+
+
+ddfpp
+
+$$ \frac{\partial^2 f}{\partial p^2} = -\dfrac{4n_\text{b}}{\left(2p+q-2\right)^2}+n_\text{a}\left(-\dfrac{1}{\left(p+2q-2\right)^2}-\dfrac{1}{p^2}\right)-\dfrac{n_\text{ab}}{p^2}-\dfrac{2n_\text{o}}{\left(-p-q+1\right)^2}
+$$
+
+ddfqp
+
+
+$$\frac{\partial^2 f}{\partial q \partial p } = -\dfrac{2n_\text{b}}{\left(2p+q-2\right)^2}-\dfrac{2n_\text{a}}{\left(p+2q-2\right)^2}-\dfrac{2n_\text{o}}{\left(-p-q+1\right)^2}
+$$
+
+ddfqq
+
+$$ \frac{\partial^2 f}{\partial q^2} = -\dfrac{4n_\text{a}}{\left(2q+p-2\right)^2}+n_\text{b}\left(-\dfrac{1}{\left(q+2p-2\right)^2}-\dfrac{1}{q^2}\right)-\dfrac{n_\text{ab}}{q^2}-\dfrac{2n_\text{o}}{\left(-q-p+1\right)^2}
+$$
+
+ddfpq
+
+$$\frac{\partial^2 f}{\partial p \partial q } =-\dfrac{2n_\text{b}}{\left(2p+q-2\right)^2}-\dfrac{2n_\text{a}}{\left(p+2q-2\right)^2}-\dfrac{2n_\text{o}}{\left(-p-q+1\right)^2}
+$$
+
+
+
+
+
+## Data
+
+
+
+# Analysis and Results.
+
+
+## Newton-Raphson Algorithm
+
+
+
+```{r Data}
+
+
+# Data
+
+n_A = 9123
+n_B = 2987
+n_AB = 1269
+n_O = 7725
+n = n_A + n_B + n_AB + n_O
+
+```
+
+```{r }
+
+# The log likelihood function,
+
+l = function(p, q) {
+
+  f = n_A * log(p^2+2*p*(1−p−q)) + n_B*log(q^2+2*q*(1−p−q)) + n_AB*log(2*p*q) + n_O*log((1−p−q)^2)
+
+  return(f)
+}
+
+
+
+# Function that calculates the full first derivative. 
+
+Df = function(p, q){
+  
+  # dfp =   ( n_A*(2 - 2*p - 2*q) / (p^2+2*p*(1−p−q)) )   
+  #       + (n_B * (-2*q) / (q^2+2*q*(1−p−q))) 
+  #       + (n_AB/p) 
+  #       + (-2*n_O / (1−p−q))
+  
+  dfp = (2*n_b)/(2*p+q-2)+n_a*(1/(p+2*q-2)+1/p)+n_ab/p-(2*n_o)/(-p-q+1)
+  
+  
+  # dfq =   ( n_A*(2*p ) / (p^2+2*p*(1−p−q)) )   
+  #       + (n_B * (2 - 2*p - 2*q) / (q^2+2*q*(1−p−q))) 
+  #       + (n_AB/q) 
+  #       + (-2*n_O / (1−p−q))
+  
+  dfq = (2*n_a)/(2*q+p-2)+n_b*(1/(q+2*p-2)+1/q)+n_ab/q-(2*n_o)/(-q-p+1)
+  
+  return( c(dfp, dfq) )
+}
+
+
+
+# Function that calculates the Hessian.
+
+DDf = function(p, q) {
+  
+      
+    d2fpp = -(4*n_b)/(2*p+q-2)^2+n_a*(-1/(p+2*q-2)^2-1/p^2)-n_ab/p^2-(2*n_o)/(-p-q+1)^2
+    
+    a = d2fpp
+    
+    
+    d2fqp = -(2*n_a)/(2*q+p-2)^2-(2*n_b)/(q+2*p-2)^2-(2*n_o)/(-q-p+1)^2
+    
+    
+    
+     c = d2fqp    
+    
+    
+    
+    d2fqq = -(4*n_a)/(2*q+p-2)^2+n_b*(-1/(q+2*p-2)^2-1/q^2)-n_ab/q^2-(2*n_o)/(-q-p+1)^2
+    
+    
+    
+    
+     d = d2fqq
+    
+    
+    
+    
+    
+    d2fpq = -(2*n_b)/(2*p+q-2)^2-(2*n_a)/(p+2*q-2)^2-(2*n_o)/(-p-q+1)^2
+    
+    
+    
+    
+     b = d2fpq
+    
+    
+    
+    
+    
+
+    
+    
+    
+      
+    H = matrix( c(a, b, c, d), nrow = 2)
+}
+
+#H = 2 x 2
+
+```
+
+
+
+```{r}
+# p_NN
+# q_NN
+# 
+# p0 = .1
+# q0 = .2
+# 
+# NN = 100
+# 
+# #while( !( abs(p_N[i+1] - p_N[i]) < eps1 & abs(q_N[i+1] - q_N[i]) < eps2) | i < N) {
+# 
+# for (i in 1:NN) {
+# 
+#   p_NN[i] = p0
+#   q_NN[i] = q0
+# 
+#   p1 = p0 - DDl(p0, q0) %*% Dl(p0, q0)  
+#   
+#    2x1     2X1          2x2          2x1
+# 
+# 
+# 
+#   #if( )
+# 
+# 
+#   p0 = p1
+#   q0 = q1
+# 
+# 
+# 
+# 
+# 
+# 
+# }
+
+
+```
+
+
+
+## EM Algorithm
+
+
+```{r}
+
+n_A = 9123
+n_B = 2987
+n_AB = 1269
+n_O = 7725
+n = n_A + n_B + n_AB + n_O
+
+# Starting estimates
+
+p_N = 0
+q_N = 0
+
+p = .6
+q = .6
+
+p = .1
+q = .1
+
+p_N[2] = p
+q_N[2] = q
+
+N = 100 # Number of max iterations.
+i = 1
+eps1 = .00005
+eps2 = .00005
+
+# 2 assumptions 
+
+while( !( abs(p_N[i+1] - p_N[i]) < eps1 & abs(q_N[i+1] - q_N[i]) < eps2) | i < N) { 
+      
+        # Expectation Step
+      
+        E_nAA = n_A * ( (p^2) / ( p^2 + 2*p*(1-p-q) ) )
+        E_nAO = n_A * ( (2*p*(1-p-q)) / ( p^2 + 2*p*(1-p-q) ) )
+        E_nBB = n_B * ( (q^2) / ( p^2 + 2*p*(1-p-q) ) )
+        E_nBO = n_B * ( (2*q*(1-p-q)) / ( p^2 + 2*p*(1-p-q) ) )
+        
+        # Maximization step
+        
+        p = (2* E_nAA + E_nAO + n_AB) / (2*n) 
+        q = (2* E_nBB + E_nBO + n_AB) / (2*n)
+        
+        p_N[i+2] = p
+        q_N[i+2] = q
+      
+        i = i + 1
+  
+}
+
+print(i)
+print(p)
+print(q)
+
+```
+
+
+
+
+
+```{r}
+
+
+
+```
+
+
+# Discussion
+
+## Comparing Algorithm Speed and Efficiency. 
+
+## Comparing Algorithms' robustness to initial vaules
+
+# References
+
+

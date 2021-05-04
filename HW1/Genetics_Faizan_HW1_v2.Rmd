@@ -1,0 +1,696 @@
+---
+title: "Estimation Methods of ABO-Gene Allele Frequency in Population using Phenotypic Blood-Type Data. Estimating ABO-Gene Allele Frequency in Population using Phenotypic Blood-Type Data."
+author: "Faizan Khalid Mohsin"
+date: "September 22, 2020"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(width = 121)
+require(knitr)
+require(dplyr)
+```
+
+
+
+# Introduction
+
+The ABO-gene (ABO locus) found on chromosome 9 can have 3 alleles (antigens: A, B, O). Different pairings of these alleles (AA, AB, BB, AO, etc.) lead to four phenotypic manifestations in the form of 4 blood types: A, B, AB, O.
+
+We want to estimate the frequency of the 3 alleles A, B, O in the population. One way to do this would be to take blood samples of a big sample of people from the population of interest and using DNA sequencing to determine the allele type (A or B or O) on the ABO-gene on chromosome 9. However, to get reliable frequency estimates one needs to do to DNA sequency for a large number of people, which will be extremely expensive and time consuming. 
+A more practical and more efficient method for estimating the 3 allele frequencies of a population would be to collect the phenotypic data, the blood type A, B, AB or O of people, which would be much more cheaper and easier to do at a large scale and using the theoretical work to estimate the 3 allele frequencies in the population using the phenotypic blood type data.  
+
+In this paper we will layout the theoretical framework for estimating the allele frequency using phenotypic blood type data and use two separate algorithms and approaches for the estimations. Finally, we will use the actual blood type data gathered from a sample of 2114 people to demonstrate and estimate the allele frequency using the two algorithms.
+
+
+# Method
+
+We use two methods for approximating the allele frequencies: Expectation-Maximization method and Newton-Raphson method.
+
+In the ideal case we could sample n people and find out how many people possess allele A (nA), how many possess allele B (nB) and how many possess allele (nO). In such a case it would be very easy to calculate the allele frequency in the population: freq(A) = nA/n, freq(B) = nB/n, and freq(O) = nO/n. And we would be done. However, getting nA, nB, nO directly from DNA sequencing is very expensive and time consuming. It is much easier to collect the blood type of each individual from the sample of n people. This will give us a numeric count of how many people have each blood type, namely, n_A: number of people with blood type A, n_B: number of people with blood type B, n_AB: number of people with blood type AB and n_O: number of people with blood type O. 
+We use genetics to link the number of individuals with alleles nA, nB, and nO with number of people with phenotypes n_A, n_B, n_AB, and n_O (blood-type). 
+
+## Theoretical Framework. 
+
+### Genetical Theory
+
+From genetic theory we know that alleles A, B are dominant to allele O; alleles A, B are co-dominant; and allele O is recessive to alleles A, B. Using this below is a mapping from genotype to phenotype. 
+Genotype                 Phenotype
+ AA or AO      -             A
+BB or BO       -             B
+     AB             -            AB
+     OO            -            O
+
+### Hardy–Weinberg equilibrium.
+
+
+$$p=freq(\mbox{allele } A),$$
+$$q=freq(\mbox{allele } B),$$
+$$o=freq(\mbox{allele } O)= 1-p-q .$$
+
+$$freq(AA)=p^2, \: \:  freq(AO)=2p(1-p-q),$$
+$$freq(BB)=q^2, \: \: freq(BO)=2q(1-p-q),$$
+$$freq(AB)=2pq, \: \: freq(OO)=(1-p-q)^2.$$
+
+
+
+
+$$freq(A)=p^2+2p(1-p-q),$$
+$$freq(B)=q^2+2q(1-p-q),$$
+$$freq(AB)=2pq,$$
+$$freq(O)=(1-p-q)^2.$$
+
+
+
+Going from allele frequency to genotypic frequency and going from genotypic frequency to phenotypic frequency.
+
+he Hardy-Weinberg principle states that a population’s allele and genotype frequencies will remain constant in the absence of evolutionary mechanisms. Ultimately, the Hardy-Weinberg principle models a population without evolution under the following conditions:
+
+no mutations
+no immigration/emigration
+no natural selection
+no sexual selection
+a large population
+Although no real-world population can satisfy all of these conditions, the principle still offers a useful model for population analysis.
+
+
+
+How reasonable is it to assume HWE. 
+
+<!-- https://bio.libretexts.org/Bookshelves/Introductory_and_General_Biology/Book%3A_General_Biology_(Boundless)/19%3A_The_Evolution_of_Populations/19.1%3A_Population_Evolution/19.1C%3A_Hardy-Weinberg_Principle_of_Equilibrium -->
+
+
+### Statistical Theory:
+
+From the notes of Professor Lei Sun, using Hardy-Weinberg assumption and ...., it can be seen that the log likelihood function is:
+
+
+$$ln(L) \sim n_\text{A}\ln\left(p^2+2\left(-p q+1\right)p\right)+n_\text{AB}\ln\left(2qp\right)+2n_\text{O}\ln\left(-p-q+1\right)+n_\text{B}\ln\left(2q\left(-p-q+1\right)+q^2\right)
+$$
+
+
+Using the properties of log we can be simplified to the following: 
+
+$$ln(L) \sim n_\text{B}\ln\left(-q\left(2p+q-2\right)\right)+n_\text{A}\ln\left(-p\left(p+2q-2\right)\right)+n_\text{AB}\ln\left(2qp\right)+2n_\text{O}\ln\left(-p-q+1\right)
+$$
+And then further simply to:
+
+$$ln(L) \sim n_\text{B}\ln\left(2p+q-2\right)+n_\text{A}\ln\left(p+2q-2\right)+n_\text{AB}\ln\left(p\right)+n_\text{A}\ln\left(-p\right)+2n_\text{O}\ln\left(-p-q+1\right)+n_\text{AB}\ln\left(2q\right)+n_\text{B}\ln\left(-q\right)
+$$
+
+
+We can find the maxima’s of this by taking the first derivative, equating to zero and then solving for p and q. However, this is very difficult to do analytically. Hence, we will use two different algorithms and approaches to estimate p and q. Namely, the Estimation-Maximization algorithm and the Newton-Raphson algorithm.
+
+
+## Newton-Raphson Algorithm Method
+
+The other method is a more direct method where we directly find the maxima’s of the loglikelihood function using numeric computational method called Newton-Raphson algorithm. 
+
+To approximate the values of $\hat{p}, \hat{q}.$ 
+
+
+<!-- https://webdemo.myscript.com/views/math/index.html#        hand written to latex and code-->
+<!-- https://www.derivative-calculator.net/        all the derivatives -->
+
+
+
+<!-- n_B*ln(2*p+q-2) + n_B*ln(-q) + n_A*ln(p+2*q-2) + n_A*ln(-p) + n_AB*ln(p) + n_AB*ln(2*q) + 2*n_O*ln(-p-q+1) -->
+
+
+We need to get the full first derivative of this with respect to p and q. 
+
+
+A numerical iterative approach to obtain the maximum (or the minimum) a function: $f(\vec \theta)$, $(\vec \theta \in R^n)$, e.g.
+$$f(\vec \theta) = lnL(p,q) = f(p,q)$$
+
+
+It is based on the first derivatives (gradient vector), e.g.
+ 
+\[ f'(\vec \theta) = f'(p,q) = 
+\left[ \begin{array}{c} 
+\frac{\partial{f(p,q)}}{\partial{p}}\\
+\frac{\partial{f(p,q)}}{\partial{q}}
+\end{array} \right] \]
+
+where:
+
+
+$$ \frac{\partial f}{\partial p } = \dfrac{2n_\text{B}}{2p+q-2}+n_\text{A}\left(\dfrac{1}{p+2q-2}+\dfrac{1}{p}\right)+\dfrac{n_\text{AB}}{p}-\dfrac{2n_\text{O}}{-p-q+1}
+$$
+
+
+
+$$\frac{\partial f}{\partial q } = \dfrac{2n_\text{A}}{2q+p-2}+n_\text{B}\left(\dfrac{1}{q+2p-2}+\dfrac{1}{q}\right)+\dfrac{n_\text{AB}}{q}-\dfrac{2n_\text{O}}{-q-p+1}
+$$
+
+
+
+and the second derivatives (Hessian matrix):
+
+\[ f''(\vec \theta) = f''(p,q) = 
+\left[ \begin{array}{cc} 
+\frac{\partial^2 {f(p,q)}}{{\partial{p}}^2}&
+\frac{\partial^2 {f(p,q)}}{\partial{p}\partial{q}}\\
+\frac{\partial^2 {f(p,q)}}{\partial{q}\partial{p}}&
+\frac{\partial^2 {f(p,q)}}{{\partial{q}}^2}
+\end{array} \right] \]
+
+
+where: 
+
+The second derivatives which are the components of the hessian are as follows:
+
+
+
+$$ \frac{\partial^2 f}{\partial p^2} = -\dfrac{4n_\text{B}}{\left(2p+q-2\right)^2}+n_\text{A}\left(-\dfrac{1}{\left(p+2q-2\right)^2}-\dfrac{1}{p^2}\right)-\dfrac{n_\text{AB}}{p^2}-\dfrac{2n_\text{O}}{\left(-p-q+1\right)^2}
+$$
+
+
+$$\frac{\partial^2 f}{\partial q \partial p } = -\dfrac{2n_\text{B}}{\left(2p+q-2\right)^2}-\dfrac{2n_\text{A}}{\left(p+2q-2\right)^2}-\dfrac{2n_\text{O}}{\left(-p-q+1\right)^2}
+$$
+
+
+
+$$ \frac{\partial^2 f}{\partial q^2} = -\dfrac{4n_\text{A}}{\left(2q+p-2\right)^2}+n_\text{B}\left(-\dfrac{1}{\left(q+2p-2\right)^2}-\dfrac{1}{q^2}\right)-\dfrac{n_\text{AB}}{q^2}-\dfrac{2n_\text{O}}{\left(-q-p+1\right)^2}
+$$
+
+
+$$\frac{\partial^2 f}{\partial p \partial q } =-\dfrac{2n_\text{B}}{\left(2p+q-2\right)^2}-\dfrac{2n_\text{A}}{\left(p+2q-2\right)^2}-\dfrac{2n_\text{O}}{\left(-p-q+1\right)^2}
+$$
+
+
+
+ The algorithm is such:
+
+
+
+Choose a starting value, $\vec \theta ^{(0)}$. 
+
+For $k=1,2,...$ the updating function is
+
+$$\vec \theta^{(k)} = \vec \theta^{(k-1)} 
+- [f''(\vec \theta^{(k-1)})]^{-1} f'(\vec \theta^{(k-1)})$$  
+
+
+Under certain conditions, $\{\vec \theta^{(k)}\}$ converges to the value that maximizes (or minimizes) the function. 
+
+
+ A few notes on the Newton-Raphson algorithm. 
+
+
+
+ The staring value, $\vec \theta ^{(0)}$, is important: the algorithm is not guaranteed to converge from all starting values, particularly in regions where the matrix $- [f''(\vec \theta^{(k-1)})]$ is no positive definite.
+
+(Staring values may be obtained from some crude parameter estimates.) 
+
+
+The advantage of Newton's method is: once the iterates are close to the solution, convergence is extremely fast.
+
+
+If the iterations do not converge: they typically  move off quickly toward the edge of the parameter space. 
+
+(The remedy can be trying again with a new staring point.) 
+
+
+The computational load can be heavy, if the number of parameters is large, because of the inverse of the Hessian matrix. 
+
+
+## Estimation-Maximization Algorithm Method
+
+One method to solving this is to think of the allele frequencies as latent variables or missing variables. In this approach we can cast the problem in the framework of EM algorithm. 
+
+To implement the EM algorithm we reframe the question in terms of a missing data problem. 
+
+The Expectation-Maximization (EM) algorithm is a numerical iterative method for finding the Maximum Likelihood Estimates (MLE) of parameters. 
+
+
+EM algorithms are often used in situations where the problem of estimation can be solved much easier if certain additional pieces of data are available. 
+
+
+The ABO-blood problem can be formulated as such incomplete data or missing data problem: 
+
+
+Some of the  counts of the 6 genotypes are missing:
+among blood type A: $n_{A}=n_{AA}+n_{AO}$,
+among blood type B: $n_{B}=n_{BB}+n_{BO}$.
+
+
+Complete data:
+$n_{AA}$, $n_{AO}$, $n_{BB}$, $n_{BO}$, $n_{AB}$, $n_{OO}$.
+
+
+Observed data:
+$n_A=n_{AA}+n_{AO}$, $n_B=n_{BB}+n_{BO}$,
+$n_{AB}=n_{AB}$, $n_{O}=n_{OO}$.
+
+
+Missing data:
+$n_{AA}$ or $n_{AO}$, $n_{BB}$ or $n_{BO}$.
+
+
+$p=freq(\mbox{allele } A)$ and 
+$q=freq(\mbox{allele } B)$.
+
+
+
+E-step: the expected value of the log likelihood is calculated (when the log likelihood is linear w.r.t. to the missing data as in this case, then essentially, the missing data are imputed), assuming some initial values for the parameters, e.g. given the initial parameter values $p^{(0)}$, $q^{(0)}$:
+
+
+{\small
+$E[n_{AA}] = \frac{freq(AA)}{freq(AA)+freq(AO)} n_A $\\
+\hspace*{1.8cm}
+$=\frac{p^{(0)}p^{(0)}}{p^{(0)}p^{(0)}+2p^{(0)}(1-p^{(0)}-q^{(0)})} n_A = n_{AA}^{(0)}$ \\
+\bigskip
+
+$E[n_{AO}] = n_A-n_{AA} = \frac{freq(AO)}{freq(AA)+freq(AO)} n_A$\\
+\hspace*{1.8cm}
+$=\frac{2p^{(0)}(1-p^{(0)}-q^{(0)})}{p^{(0)}p^{(0)}+2p^{(0)}(1-p^{(0)}-q^{(0)})} n_A = n_{AO}^{(0)}$ \\
+\bigskip
+\bigskip
+
+$E[n_{BB}] = \frac{freq(BB)}{freq(BB)+freq(BO)} n_B $\\
+\hspace*{1.8cm}
+$=\frac{q^{(0)}q^{(0)}}{q^{(0)}q^{(0)}+2q^{(0)}(1-p^{(0)}-q^{(0)})} n_B = n_{BB}^{(0)}$ \\
+\bigskip
+
+$E[n_{BO}] = n_B-n_{BB} = \frac{freq(BO)}{freq(BB)+freq(BO)} n_B$\\
+\hspace*{1.8cm}
+$=\frac{2q^{(0)}(1-p^{(0)}-q^{(0)})}{q^{(0)}q^{(0)}+2q^{(0)}(1-p^{(0)}-q^{(0)})} n_B = n_{BO}^{(0)}$ \\
+}
+
+M-step: MLE can then be calculated based on 
+\centerline{imputed missing data + observed data = complete data}
+
+
+e.g. MLE of the parameters of interest, $p$ and $q$, given the imputed missing data
+($n_{AA}^{(0)}$, $n_{AO}^{(0)}$, $n_{BB}^{(0)}$, $n_{BO}^{(0)}$), and
+ the observed data ($n_{AB}$, $n_{OO}$):
+
+$$p^{(1)} = \frac{2n_{AA}^{(0)}+n_{AO}^{(0)}+n_{AB}}{2n}$$
+
+$$q^{(1)} = \frac{2n_{BB}^{(0)}+n_{BO}^{(0)}+n_{AB}}{2n}$$
+
+
+where $n=n_{A}+n_{B}+n_{AB}+n_{O}$, the total number of individuals in the sample.
+
+$p^{(1)}$ and $q^{(1)}$ are improved estimates of the parameters!
+
+
+Use $p^{(1)}$ and $q^{(1)}$ to perform the E-step again, and then perform the M-step to obtain improved estimates, 
+$p^{(2)}$ and $q^{(2)}$.
+
+
+Continue until convergence: the changes in parameter estimates ($p^{(k)}-p^{(k-1)}$, $q^{(k)}-q^{(k-1)}$) are negligible for the purpose
+of the study.
+
+
+A couple of comments on the EM algorithm: 
+
+
+Under regular conditions, the algorithm converges to a local mode of the posterior density. 
+
+The rate at which the EM algorithm converges depends on the proportion of missing ``information''. 
+
+
+## Sample Space of p & q and initial values. 
+
+
+```{r}
+
+
+a1 = seq(0.03, 1, .15)
+b1 = rep(a1[1], length(a1))
+a2 = seq(a1[1], .8, .15)
+b2 = rep(a1[2], length(a2))
+a3 = seq(a1[1], .65, .15)
+b3 = rep(a1[3], length(a3))
+a4 = seq(a1[1], .50, .15)
+b4 = rep(a1[4], length(a4))
+a5 = seq(a1[1], .35, .15)
+b5 = rep(a1[5], length(a5))
+a6 = seq(a1[1], .2, .15)
+b6 = rep(a1[6], length(a6))
+a7 = a1[1]
+b7 = rep(a1[7], length(a7))
+
+
+pi = c(a1, a2, a3, a4, a5, a6, a7)
+qi = c(b1, b2, b3, b4, b5, b6, b7)
+
+
+library(ggplot2)
+
+fun1 <- function(q) 1 - q
+fun2 <- function(q) 0
+fun3 <- function(q) 0
+q = seq(0,1, length.out = length(qi))
+mydf = data.frame(q, p=fun1(q), y2=fun2(q),y3= fun3(q))
+mydf <-  transform(mydf, z = pmax(p,pmin(y2,y3)))
+ggplot(mydf, aes(x = q)) + 
+  geom_line(aes(y = p), colour = 'blue', size = 2) +
+  geom_line(aes(y = y2), colour = 'green', size = 2) +
+  geom_line(aes(y = y3), colour = 'red', size = 2) +
+  geom_ribbon(aes(ymin=0,ymax = z), fill = 'gray60') + 
+  geom_point(aes(x = qi, y = pi)) +
+  geom_text(x=.75, y=.75, label="Constraints: \n p + q < 1 \n p > 0 \n q > 0")
+
+
+```
+
+
+## Data
+
+```{r Data, echo=FALSE}
+# Data
+
+n_A = 9123
+n_B = 2987
+n_AB = 1269
+n_O = 7725
+n = n_A + n_B + n_AB + n_O
+
+data_counts = c(n_A, n_B, n_AB, n_O, n)
+
+DATA  = data.frame("Blood_Type" = c("A", "B", "AB", "O", "Total" ), "Count" = data_counts, "Frequency" = round(data_counts/n, 2) ) 
+
+kable(DATA, col.names = c("Blood-Type", "Count", "Frequency") , caption = "Table 1: Blood-Type and their counts in the sample population.")
+
+```
+
+
+# Analysis and Results.
+
+
+## Newton-Raphson Algorithm
+
+
+```{r }
+
+# The log likelihood function,
+loglikf = function(p, q) {
+
+  f = n_A * log(p^2+2*p*(1−p−q)) + n_B*log(q^2+2*q*(1−p−q)) + n_AB*log(2*p*q) + n_O*log((1−p−q)^2)
+  return(f)
+}
+
+# Function that calculates the full first derivative. 
+Df = function(p, q){
+  
+  dfp = (2*n_B)/(2*p+q-2)+n_A*(1/(p+2*q-2)+1/p)+n_AB/p-(2*n_O)/(-p-q+1)
+  
+  dfq = (2*n_A)/(2*q+p-2)+n_B*(1/(q+2*p-2)+1/q)+n_AB/q-(2*n_O)/(-q-p+1)
+  
+  return( c(dfp, dfq) )
+}
+
+# Function that calculates the Hessian.
+DDf = function(p, q) {
+  
+    d2fpp = -(4*n_B)/(2*p+q-2)^2+n_A*(-1/(p+2*q-2)^2-1/p^2)-n_AB/p^2-(2*n_O)/(-p-q+1)^2
+    a = d2fpp
+    d2fqp = -(2*n_A)/(2*q+p-2)^2-(2*n_B)/(q+2*p-2)^2-(2*n_O)/(-q-p+1)^2
+    c = d2fqp    
+    d2fqq = -(4*n_A)/(2*q+p-2)^2+n_B*(-1/(q+2*p-2)^2-1/q^2)-n_AB/q^2-(2*n_O)/(-q-p+1)^2
+    d = d2fqq
+    d2fpq = -(2*n_B)/(2*p+q-2)^2-(2*n_A)/(p+2*q-2)^2-(2*n_O)/(-p-q+1)^2
+    b = d2fpq
+    
+    H = matrix( c(a, b, c, d), nrow = 2)
+    return(H)
+}
+
+
+```
+
+
+
+```{r NR}
+
+nr_algo = function(p0 = .34,  q0 = .34, maxiter = 100, epsilon_p = .000000001, epsilon_q = .000000001){
+
+  # p0 + q0 < 1 # contraint
+  
+  x0 = c(p0, q0)
+  x1  =  x0  -  solve(DDf(x0[1], x0[2])) %*% Df(x0[1], x0[2])
+
+  p_NN =  c(x0[1], x1[1])
+  q_NN =  c(x0[2], x1[2])
+  
+  j = 2
+  while( !( ( abs(x1[1] - x0[1]) < epsilon_p & abs(x1[2] - x0[2]) < epsilon_q | j > maxiter ) ) ) {
+  
+    x0 = x1
+  
+    x1  =  x0  -  solve(DDf(x0[1], x0[2])) %*% Df(x0[1], x0[2])
+  # 2x1 =  2X1 -            2x2            %*%        2x1
+    
+    j = j + 1
+    p_NN[j] =  x1[1]
+    q_NN[j] =  x1[2]
+  }
+  
+  #j = j - 1
+  results_data = data.frame(p0 = p0, q0 = q0, maxiter = maxiter, epsilon_p = epsilon_p, epsilon_q = epsilon_q, ecl_dist_p0q0_to_pq = round(((x1[1] - p0)^2 +(x1[2]-q0)^2)^.5,3), man_dist_p0q0_to_pq = round(abs(x1[1] - p0) + abs(x1[2]-q0), 3) , j = j, p = x1[1], q = x1[2])
+  
+  p_q_data = data.frame(j = 1:j, p_NN = p_NN, q_NN = q_NN)
+  
+  return(list( results_data, p_q_data))
+  #return(list(results_data$results_data = results_data, p_q_data$p_q_data = p_q_data))
+}
+#nr_algo()
+
+```
+
+
+```{r}
+
+p0_vec = rep(pi, 4)
+q0_vec = rep(qi, 4)
+
+epsilon_p_vec = rep(c(10^-3, 10^-5, 10^-10, 10^-16), each = length(pi))
+epsilon_q_vec = rep(c(10^-3, 10^-5, 10^-10, 10^-16), each = length(qi))
+
+sapply(list(p0_vec, q0_vec, epsilon_p_vec, epsilon_q_vec), length )
+
+
+combinations = length(p0_vec)
+
+nr_results = data.frame()
+nr_results_pq_vec = data.frame()
+t0_nr = Sys.time()
+for (i in 1:combinations){
+  
+  results = nr_algo(p0 = p0_vec[i],  
+                    q0 = q0_vec[i], 
+                    maxiter = 500, 
+                    epsilon_p = epsilon_p_vec[i],
+                    epsilon_q = epsilon_q_vec[i])
+  
+  nr_results = data.frame(rbind(nr_results, results[[1]]))
+  #nr_results_pq_vec[i,] = results[[2]]
+}
+tf_nr = Sys.time() - t0_nr
+tf_nr
+dim(nr_results)
+#nr_results
+```
+
+
+
+```{r}
+
+nr_results_accuracy_table = nr_results %>% filter( p < 1 ) %>% group_by(epsilon_p) %>% summarize(n = n(), mean_num_iterations = mean(j), min_num_iter = min(j), max_num_iter = max(j), mean_p = mean(p), mean_q = mean(q)) 
+
+nr_results_accuracy_table$epsilon_p = as.character(nr_results_accuracy_table$epsilon_p)
+kable(nr_results_accuracy_table, caption = "Table 2: Grouping estimates and number of iterations based on accuracy.", col.names = c("Accuracy", "n", "mean number of iterations", "min iterations", "max iterations", "mean p estimate", "mean q estimate"), align = "c")
+
+```
+
+```{r}
+nr_results %>% filter( p < 1 ) %>% group_by(epsilon_p) %>% summarize(n = n(), mean_num_iterations = mean(j), min_num_iter = min(j), max_num_iter = max(j), mean_p = mean(p), mean_q = mean(q)) 
+```
+
+
+## EM Algorithm
+
+```{r}
+
+em_algo = function( p0 = .34,  q0 = .34, maxiter = 100, epsilon_p = .00005,  epsilon_q = .00005){
+
+      # Starting estimates
+      p_initial = p0
+      q_initial = q0
+      
+      # Expectation Step
+                
+      E_nAA = n_A * ( (p0^2) / ( p0^2 + 2*p0*(1-p0-q0) ) )
+      E_nAO = n_A * ( (2*p0*(1-p0-q0)) / ( p0^2 + 2*p0*(1-p0-q0) ) )
+      E_nBB = n_B * ( (q0^2) / ( p0^2 + 2*q0*(1-p0-q0) ) )
+      E_nBO = n_B * ( (2*q0*(1-p0-q0)) / ( q0^2 + 2*p0*(1-p0-q0) ) )
+      
+      # Maximization step
+      
+      p1 = (2* E_nAA + E_nAO + n_AB) / (2*n)
+      q1 = (2* E_nBB + E_nBO + n_AB) / (2*n)
+      
+      
+      p_NN = c(p0, p1)
+      q_NN = c(q0, q1)
+      
+      # 2 assumptions: hwe and 
+      j = 2
+      while( !( abs(p1 - p0) < epsilon_p & abs(q1 - q0) < epsilon_q | j > maxiter) ) { 
+        
+              p0 = p1
+              q0 = q1
+        
+              # Expectation Step
+            
+              E_nAA = n_A * ( (p0^2) / ( p0^2 + 2*p0*(1-p0-q0) ) )
+              E_nAO = n_A * ( (2*p0*(1-p0-q0)) / ( p0^2 + 2*p0*(1-p0-q0) ) )
+              E_nBB = n_B * ( (q0^2) / ( q0^2 + 2*q0*(1-p0-q0) ) )
+              E_nBO = n_B * ( (2*q0*(1-p0-q0)) / ( q0^2 + 2*q0*(1-p0-q0) ) )
+              
+              # Maximization step
+              
+              p1 = (2* E_nAA + E_nAO + n_AB) / (2*n) 
+              q1 = (2* E_nBB + E_nBO + n_AB) / (2*n)
+              
+              j = j + 1
+              p_NN[j] = p1
+              q_NN[j] = q1
+      }
+      
+      results_data = data.frame(p0 = p_initial, q0 = q_initial, maxiter = maxiter, epsilon_p = epsilon_p, epsilon_q = epsilon_q, ecl_dist_p0q0_to_pq = round(((p1 - p_initial)^2 +(q1-q_initial)^2)^.5, 3), man_dist_p0q0_to_pq = round((abs(p1 - p_initial) + abs(q1-q_initial)), 3) , j = j, p = p1, q = q1)
+  
+      p_q_data = data.frame(j = 1:j, p_NN = p_NN, q_NN = q_NN)
+  
+      return(list( results_data, p_q_data))
+
+}
+
+#em_algo()
+
+
+```
+
+
+
+```{r}
+
+p0_vec = rep(pi, 4)
+q0_vec = rep(qi, 4)
+
+epsilon_p_vec = rep(c(10^-3, 10^-5, 10^-10, 10^-16), each = length(pi))
+epsilon_q_vec = rep(c(10^-3, 10^-5, 10^-10, 10^-16), each = length(qi))
+
+sapply(list(pi, qi, p0_vec, q0_vec, epsilon_p_vec, epsilon_q_vec), length )
+
+combinations = length(p0_vec)
+
+em_results = data.frame()
+em_results_pq_vec = data.frame()
+
+t0_em = Sys.time()
+for (i in 1:combinations){
+  
+  results = em_algo(p0 = p0_vec[i],  
+                    q0 = q0_vec[i], 
+                    maxiter = 100, 
+                    epsilon_p = epsilon_p_vec[i],
+                    epsilon_q = epsilon_q_vec[i])
+  
+  em_results = rbind(em_results, results[[1]])
+  #nr_results_pq_vec[i,] = results[[2]]
+}
+tf_em = Sys.time() - t0_em
+tf_em
+dim(em_results)
+#em_results
+
+
+```
+
+
+
+
+```{r}
+
+em_results_accuracy_table = em_results %>% filter( p < 1 ) %>% group_by(epsilon_p) %>% summarize(n = n(), mean_num_iterations = mean(j), min_num_iter = min(j), max_num_iter = max(j), mean_p = mean(p), mean_q = mean(q)) 
+
+em_results_accuracy_table$epsilon_p = as.character(em_results_accuracy_table$epsilon_p)
+kable(em_results_accuracy_table, caption = "Table 3: Grouping estimates and number of iterations based on accuracy.", col.names = c("Accuracy", "n", "mean number of iterations", "min iterations", "max iterations", "mean p estimate", "mean q estimate"), align = "c")
+
+```
+
+
+
+# Discussion
+
+## Comparing Algorithm Speed and Efficiency. 
+
+## Comparing Algorithms' robustness to initial vaules.
+
+The sample space of the paramters is p, q > 0 and p + q < 1. However, we need to be away from the boundry of the sample space since near or at the boundry of the sample space the Hessian Matrix can become sigular. To see the robustness to initial values of the two algorithms we start from different initial values. We choose these values such that one point is taken from each region and the sample space is covered.
+
+
+
+
+
+
+
+
+
+## Choosing the threshold for the stopping criteria.
+
+The threshold can also be thought of as the accuracy we are fine with the estimates. 
+
+First observation concerning the choice of threshold values is that the smaller we make this, (the higher the accuray we demand), the more iterations the algorithms take to reach as is expected. 
+
+In terms of how small the threshold should be and how much accuracy should be demanded, is a trade between number of iterations and computational cost versus accuracy of estimate. 
+
+In partical terms, we would never need an accuracy of greater than 5 decimal points when estimating the allele frequency in the population. Similary, the minimum accuracy we would need would be at least 3 decimal points, anything less would not be a very stable estimate. The number of iterations increases by ... from an accuracy of 3 decimal points to 5 decimal points. 
+
+We can also see that the 
+
+## Computational Time.
+
+In terms of computational time tf_nr was faster by `r paste0(round((as.numeric(tf_em) - as.numeric(tf_nr))/as.numeric(tf_nr), 3)*100, "%")`
+
+
+
+## Choosing stopping criteria.
+
+For the stopping criteria for the implementation of the two algorthims we took the difference in absolute value between sequent estimates. The distance measured in absolute values is called manhatten distance. However, we could also look if the euclidian distance (L1, or L2) is used instead. We know that euclidian distance is less than or equal to manhattan distance. 
+
+However, this is not the most robust stopping criteria, because it is possible that the subsequent change in estimates happens to be smaller than the indicated threshold. One way to . Another thing that can improve the robustness of the stopping criteria is to see check if the rate of 
+
+Another thing that could improve the robustness is that instead of looking at only two sequential estimates, to look at several sequential estimates and 
+
+Another, thind to keep in mind is that, in several algorithms, there is some randomness in built in the process. Hence, a stopping criteria that is based on several sequential points of estimates and calculating two averages and see if the decrease is small enough. This would be more stable, since two sequential point estimates can be very close randomly, but the genenral trend of the estimate points decrease is not small enough for a given threshold or accuracy. Hence, it is a more robust stopping criteria to look at a set of sequential points and comparing if the average decrease between the two sets of sequential points is less than a given threshold. 
+
+
+## Advantages and Disadvantages of the two Algorithms. 
+
+### Advantages of Expectation Maximization Algorithm
+
+### Disadvantage of Expectation Maximization Algorithm
+
+### Advantages of Newton Raphson Algorithm
+
+### Disadvantage of Newton Raphson Algorithm.
+
+
+One disadvantage in both algorithms is that it is possible that the algorithm converges to a local instead of global minimum or maximum. 
+
+
+One way to determine if we have converged to a global maximum is to do a dense search of the sample space and plot the graph of the log-likelihood. This will 
+
+## 
+
+# References
+
+

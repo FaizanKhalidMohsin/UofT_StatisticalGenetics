@@ -1,0 +1,387 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Statistical Genetics HW1},
+            pdfauthor={Faizan Khalid Mohsin},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{Statistical Genetics HW1}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Faizan Khalid Mohsin}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{September 22, 2020}
+
+
+\begin{document}
+\maketitle
+
+\section{Introduction}\label{introduction}
+
+\section{Method}\label{method}
+
+We use two methods for approximating the allele frequencies:
+Expectation-Maximization method and Newton-Raphson method.
+
+\subsection{Expectation-Maximization}\label{expectation-maximization}
+
+To implement the EM algorithm we reframe the question in terms of a
+missing data problem.
+
+\subsection{Newton-Raphson}\label{newton-raphson}
+
+To approximate the values of \(p\hat\)
+
+\section{Analysis and Results.}\label{analysis-and-results.}
+
+\subsection{Newton-Raphson Algorithm}\label{newton-raphson-algorithm}
+
+nAln(p 2+2p(1−p−q))+nBln(q 2+2q(1−p−q))+nABln(2pq)+nOln((1−p−q) 2 )
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Data}
+
+\NormalTok{n_A =}\StringTok{ }\DecValTok{9123}
+\NormalTok{n_B =}\StringTok{ }\DecValTok{2987}
+\NormalTok{n_AB =}\StringTok{ }\DecValTok{1269}
+\NormalTok{n_O =}\StringTok{ }\DecValTok{7725}
+\NormalTok{n =}\StringTok{ }\NormalTok{n_A }\OperatorTok{+}\StringTok{ }\NormalTok{n_B }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB }\OperatorTok{+}\StringTok{ }\NormalTok{n_O}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# The log likelihood function,}
+
+\NormalTok{l =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p, q) \{}
+
+\NormalTok{  f =}\StringTok{ }\NormalTok{n_A }\OperatorTok{*}\StringTok{ }\KeywordTok{log}\NormalTok{(p}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_B}\OperatorTok{*}\KeywordTok{log}\NormalTok{(q}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB}\OperatorTok{*}\KeywordTok{log}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{q) }\OperatorTok{+}\StringTok{ }\NormalTok{n_O}\OperatorTok{*}\KeywordTok{log}\NormalTok{((}\DecValTok{1}\NormalTok{−p−q)}\OperatorTok{^}\DecValTok{2}\NormalTok{)}
+
+  \KeywordTok{return}\NormalTok{(f)}
+\NormalTok{\}}
+
+
+
+\CommentTok{# Function that calculates the full first derivative. }
+
+\NormalTok{Df =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p, q)\{}
+  
+\NormalTok{  dfp =}\StringTok{   }\NormalTok{( n_A}\OperatorTok{*}\NormalTok{(}\DecValTok{2} \OperatorTok{-}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{p }\OperatorTok{-}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{q) }\OperatorTok{/}\StringTok{ }\NormalTok{(p}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) )   }
+        \OperatorTok{+}\StringTok{ }\NormalTok{(n_B }\OperatorTok{*}\StringTok{ }\NormalTok{(}\OperatorTok{-}\DecValTok{2}\OperatorTok{*}\NormalTok{q) }\OperatorTok{/}\StringTok{ }\NormalTok{(q}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q))) }
+        \OperatorTok{+}\StringTok{ }\NormalTok{(n_AB}\OperatorTok{/}\NormalTok{p) }
+        \OperatorTok{+}\StringTok{ }\NormalTok{(}\OperatorTok{-}\DecValTok{2}\OperatorTok{*}\NormalTok{n_O }\OperatorTok{/}\StringTok{ }\NormalTok{(}\DecValTok{1}\NormalTok{−p−q))}
+  
+\NormalTok{  dfq =}\StringTok{   }\NormalTok{( n_A}\OperatorTok{*}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p ) }\OperatorTok{/}\StringTok{ }\NormalTok{(p}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) )   }
+        \OperatorTok{+}\StringTok{ }\NormalTok{(n_B }\OperatorTok{*}\StringTok{ }\NormalTok{(}\DecValTok{2} \OperatorTok{-}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{p }\OperatorTok{-}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{q) }\OperatorTok{/}\StringTok{ }\NormalTok{(q}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q))) }
+        \OperatorTok{+}\StringTok{ }\NormalTok{(n_AB}\OperatorTok{/}\NormalTok{q) }
+        \OperatorTok{+}\StringTok{ }\NormalTok{(}\OperatorTok{-}\DecValTok{2}\OperatorTok{*}\NormalTok{n_O }\OperatorTok{/}\StringTok{ }\NormalTok{(}\DecValTok{1}\NormalTok{−p−q))}
+  
+  \KeywordTok{return}\NormalTok{( }\KeywordTok{c}\NormalTok{(dfp, dfq) )}
+\NormalTok{\}}
+
+
+
+\CommentTok{# Function that calculates the Hessian.}
+
+\NormalTok{DDf =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p, q) \{}
+  
+\NormalTok{    d2fpp =}\StringTok{ }\NormalTok{n_A }\OperatorTok{*}\StringTok{ }\KeywordTok{log}\NormalTok{(p}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_B}\OperatorTok{*}\KeywordTok{log}\NormalTok{(q}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB}\OperatorTok{*}\KeywordTok{log}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{q) }\OperatorTok{+}\StringTok{ }\NormalTok{n_O}\OperatorTok{*}\KeywordTok{log}\NormalTok{((}\DecValTok{1}\NormalTok{−p−q)}\OperatorTok{^}\DecValTok{2}\NormalTok{) }
+    
+    
+    
+    
+\NormalTok{    a =}\StringTok{ }\NormalTok{d2fpp}
+    
+    
+    
+    
+    
+\NormalTok{    d2fqq =}\StringTok{ }\NormalTok{n_A }\OperatorTok{*}\StringTok{ }\KeywordTok{log}\NormalTok{(p}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_B}\OperatorTok{*}\KeywordTok{log}\NormalTok{(q}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB}\OperatorTok{*}\KeywordTok{log}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{q) }\OperatorTok{+}\StringTok{ }\NormalTok{n_O}\OperatorTok{*}\KeywordTok{log}\NormalTok{((}\DecValTok{1}\NormalTok{−p−q)}\OperatorTok{^}\DecValTok{2}\NormalTok{)}
+    
+    
+    
+    
+\NormalTok{     d =}\StringTok{ }\NormalTok{d2fqq}
+    
+    
+    
+    
+    
+\NormalTok{    d2fpq =}\StringTok{ }\NormalTok{n_A }\OperatorTok{*}\StringTok{ }\KeywordTok{log}\NormalTok{(p}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_B}\OperatorTok{*}\KeywordTok{log}\NormalTok{(q}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB}\OperatorTok{*}\KeywordTok{log}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{q) }\OperatorTok{+}\StringTok{ }\NormalTok{n_O}\OperatorTok{*}\KeywordTok{log}\NormalTok{((}\DecValTok{1}\NormalTok{−p−q)}\OperatorTok{^}\DecValTok{2}\NormalTok{) }
+    
+    
+    
+    
+\NormalTok{     b =}\StringTok{ }\NormalTok{d2fpq}
+    
+    
+    
+    
+    
+\NormalTok{    d2fqp =}\StringTok{ }\NormalTok{n_A }\OperatorTok{*}\StringTok{ }\KeywordTok{log}\NormalTok{(p}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_B}\OperatorTok{*}\KeywordTok{log}\NormalTok{(q}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB}\OperatorTok{*}\KeywordTok{log}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{q) }\OperatorTok{+}\StringTok{ }\NormalTok{n_O}\OperatorTok{*}\KeywordTok{log}\NormalTok{((}\DecValTok{1}\NormalTok{−p−q)}\OperatorTok{^}\DecValTok{2}\NormalTok{) }
+    
+    
+    
+\NormalTok{     c =}\StringTok{ }\NormalTok{d2fqp}
+    
+    
+    
+      
+\NormalTok{    H =}\StringTok{ }\KeywordTok{matrix}\NormalTok{( }\KeywordTok{c}\NormalTok{(a, b, c, d), }\DataTypeTok{nrow =} \DecValTok{2}\NormalTok{)}
+\NormalTok{\}}
+
+\CommentTok{#H = 2 x 2}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# p_NN}
+\CommentTok{# q_NN}
+\CommentTok{# }
+\CommentTok{# p0 = .1}
+\CommentTok{# q0 = .2}
+\CommentTok{# }
+\CommentTok{# NN = 100}
+\CommentTok{# }
+\CommentTok{# #while( !( abs(p_N[i+1] - p_N[i]) < eps1 & abs(q_N[i+1] - q_N[i]) < eps2) | i < N) \{}
+\CommentTok{# }
+\CommentTok{# for (i in 1:NN) \{}
+\CommentTok{# }
+\CommentTok{#   p_NN[i] = p0}
+\CommentTok{#   q_NN[i] = q0}
+\CommentTok{# }
+\CommentTok{#   p1 = p0 - DDl(p0, q0) %*% Dl(p0, q0)  }
+\CommentTok{#   }
+\CommentTok{#    2x1     2X1          2x2          2x1}
+\CommentTok{# }
+\CommentTok{# }
+\CommentTok{# }
+\CommentTok{#   #if( )}
+\CommentTok{# }
+\CommentTok{# }
+\CommentTok{#   p0 = p1}
+\CommentTok{#   q0 = q1}
+\CommentTok{# }
+\CommentTok{# }
+\CommentTok{# }
+\CommentTok{# }
+\CommentTok{# }
+\CommentTok{# }
+\CommentTok{# \}}
+\end{Highlighting}
+\end{Shaded}
+
+\subsection{EM Algorithm}\label{em-algorithm}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{n_A =}\StringTok{ }\DecValTok{9123}
+\NormalTok{n_B =}\StringTok{ }\DecValTok{2987}
+\NormalTok{n_AB =}\StringTok{ }\DecValTok{1269}
+\NormalTok{n_O =}\StringTok{ }\DecValTok{7725}
+\NormalTok{n =}\StringTok{ }\NormalTok{n_A }\OperatorTok{+}\StringTok{ }\NormalTok{n_B }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB }\OperatorTok{+}\StringTok{ }\NormalTok{n_O}
+
+
+\CommentTok{# Starting estimates}
+
+\NormalTok{p_N =}\StringTok{ }\DecValTok{0}
+\NormalTok{q_N =}\StringTok{ }\DecValTok{0}
+        
+\NormalTok{E_nAA_N =}\StringTok{ }\DecValTok{0}
+\NormalTok{E_nAO_N =}\StringTok{ }\DecValTok{0}
+\NormalTok{E_nBB_N =}\StringTok{ }\DecValTok{0}
+\NormalTok{E_nBO_N =}\StringTok{ }\DecValTok{0}
+
+\NormalTok{p_N[}\DecValTok{2}\NormalTok{] =}\StringTok{ }\NormalTok{.}\DecValTok{6}
+\NormalTok{q_N[}\DecValTok{2}\NormalTok{] =}\StringTok{ }\NormalTok{.}\DecValTok{6}
+        
+\CommentTok{# E_nAA_N[2] = .5}
+\CommentTok{# E_nAO_N[2] = .5}
+\CommentTok{# E_nBB_N[2] = .5}
+\CommentTok{# E_nBO_N[2] = .5}
+
+\CommentTok{#for ( i in 1:N) \{}
+\NormalTok{N =}\StringTok{ }\DecValTok{100} \CommentTok{# Number of max iterations.}
+\NormalTok{i =}\StringTok{ }\DecValTok{1}
+\NormalTok{p =}\StringTok{ }\NormalTok{.}\DecValTok{6}
+\NormalTok{q =}\StringTok{ }\NormalTok{.}\DecValTok{6}
+\NormalTok{eps1 =}\StringTok{ }\NormalTok{.}\DecValTok{00005}
+\NormalTok{eps2 =}\StringTok{ }\NormalTok{.}\DecValTok{00005}
+\CommentTok{# 2 assumptions }
+
+\ControlFlowTok{while}\NormalTok{( }\OperatorTok{!}\NormalTok{( }\KeywordTok{abs}\NormalTok{(p_N[i}\OperatorTok{+}\DecValTok{1}\NormalTok{] }\OperatorTok{-}\StringTok{ }\NormalTok{p_N[i]) }\OperatorTok{<}\StringTok{ }\NormalTok{eps1 }\OperatorTok{&}\StringTok{ }\KeywordTok{abs}\NormalTok{(q_N[i}\OperatorTok{+}\DecValTok{1}\NormalTok{] }\OperatorTok{-}\StringTok{ }\NormalTok{q_N[i]) }\OperatorTok{<}\StringTok{ }\NormalTok{eps2) }\OperatorTok{|}\StringTok{ }\NormalTok{i }\OperatorTok{<}\StringTok{ }\NormalTok{N) \{ }
+      
+        \CommentTok{# Expectation Step}
+      
+\NormalTok{        E_nAA =}\StringTok{ }\NormalTok{n_A }\OperatorTok{*}\StringTok{ }\NormalTok{( (p}\OperatorTok{^}\DecValTok{2}\NormalTok{) }\OperatorTok{/}\StringTok{ }\NormalTok{( p}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q) ) )}
+\NormalTok{        E_nAO =}\StringTok{ }\NormalTok{n_A }\OperatorTok{*}\StringTok{ }\NormalTok{( (}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q)) }\OperatorTok{/}\StringTok{ }\NormalTok{( p}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q) ) )}
+\NormalTok{        E_nBB =}\StringTok{ }\NormalTok{n_B }\OperatorTok{*}\StringTok{ }\NormalTok{( (q}\OperatorTok{^}\DecValTok{2}\NormalTok{) }\OperatorTok{/}\StringTok{ }\NormalTok{( p}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q) ) )}
+\NormalTok{        E_nBO =}\StringTok{ }\NormalTok{n_B }\OperatorTok{*}\StringTok{ }\NormalTok{( (}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q)) }\OperatorTok{/}\StringTok{ }\NormalTok{( p}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q) ) )}
+        
+        
+        \CommentTok{# Maximization step}
+        
+\NormalTok{        p =}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\StringTok{ }\NormalTok{E_nAA }\OperatorTok{+}\StringTok{ }\NormalTok{E_nAO }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB) }\OperatorTok{/}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n) }
+\NormalTok{        q =}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\StringTok{ }\NormalTok{E_nBB }\OperatorTok{+}\StringTok{ }\NormalTok{E_nBO }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB) }\OperatorTok{/}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n)}
+        
+        \CommentTok{# print(paste("i: ", i))}
+        \CommentTok{# print(paste("p:", p, "q:", q))}
+        
+        \CommentTok{# Store the values}
+        
+\NormalTok{        p_N[i}\OperatorTok{+}\DecValTok{2}\NormalTok{] =}\StringTok{ }\NormalTok{p}
+\NormalTok{        q_N[i}\OperatorTok{+}\DecValTok{2}\NormalTok{] =}\StringTok{ }\NormalTok{q}
+        
+        \CommentTok{# E_nAA_N[i+2] = E_nAA}
+        \CommentTok{# E_nAO_N[i+2] = E_nAO}
+        \CommentTok{# E_nBB_N[i+2] = E_nBB}
+        \CommentTok{# E_nBO_N[i+2] = E_nBO}
+        
+        \CommentTok{#df = data.frame()}
+        
+\NormalTok{        i =}\StringTok{ }\NormalTok{i }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+  
+\NormalTok{\}}
+
+
+\KeywordTok{print}\NormalTok{(p)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2835973
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{print}\NormalTok{(q)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.03845067
+\end{verbatim}
+
+\section{Discussion}\label{discussion}
+
+\subsection{Comparing Algorithm Speed and
+Efficiency.}\label{comparing-algorithm-speed-and-efficiency.}
+
+\subsection{}\label{section}
+
+
+\end{document}

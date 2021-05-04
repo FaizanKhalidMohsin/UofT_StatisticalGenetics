@@ -1,0 +1,503 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={ABO-Gene Allele Frequency Estimation Methods using Phenotypic Blood-Type Data.},
+            pdfauthor={Faizan Khalid Mohsin},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\providecommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+
+  \title{ABO-Gene Allele Frequency Estimation Methods using Phenotypic Blood-Type
+Data.}
+    \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+    \author{Faizan Khalid Mohsin}
+    \preauthor{\centering\large\emph}
+  \postauthor{\par}
+      \predate{\centering\large\emph}
+  \postdate{\par}
+    \date{September 22, 2020}
+
+
+\begin{document}
+\maketitle
+
+\section{Introduction}\label{introduction}
+
+We have a theoretical frame work where we know that pairing combinations
+of the 3 alleles (antigens: A, B, O) on the ABO-gene (ABO locus) found
+on chromosome 9, lead to four phenotypic manifestations in the form of 4
+blood types: A, B, AB, O. Now, there is an interest in estimating the
+frequency of the 3 alleles A, B, O in the population. One way to do this
+would be to take blood samples of a big sample of people from the
+population of interest and using DNA sequencing to determine the allele
+type (A or B or O) on the ABO-gene on chromosome 9. However, to get
+reliable frequency estimates one needs to do to DNA sequency for a large
+number of people, which will be extremely expensive and time consuming.
+A more practical and more efficient method for estimating the 3 allele
+frequencies of a population would be to collect the phenotypic data, the
+blood type A, B, AB or O of people, which would be much more cheaper and
+easier to do at a large scale and using the theoretical framework to
+estimate the 3 allele frequencies in the population using the phenotypic
+blood type data.\\
+In this paper we will layout the theoretical framework for estimating
+the allele frequency using phenotypic blood type data and use two
+separate algorithms and approaches for the estimation. Finally, we will
+use the actual blood type data gathered from a sample of 2114 people to
+demonstrate and estimate the allele frequency using the two algorithms.
+
+\section{Method}\label{method}
+
+We use two methods for approximating the allele frequencies:
+Expectation-Maximization method and Newton-Raphson method.
+
+In the ideal case we could sample n people and find out how many people
+possess allele A (nA), how many possess allele B (nB) and how many
+possess allele (nO). In such a case it would be very easy to calculate
+the allele frequency in the population: freq(A) = nA/n, freq(B) = nB/n,
+and freq(O) = nO/n. And we would be done. However, getting nA, nB, nO
+directly from DNA sequencing is very expensive and time consuming. It is
+much easier to collect the blood type of each individual from the sample
+of n people. This will give us a numeric count of how many people have
+each blood type, namely, n\_A: number of people with blood type A, n\_B:
+number of people with blood type B, n\_AB: number of people with blood
+type AB and n\_O: number of people with blood type O. We use genetics to
+link the number of individuals with alleles nA, nB, and nO with number
+of people with phenotypes n\_A, n\_B, n\_AB, and n\_O (blood-type).
+
+\subsection{Theoretical Framework.}\label{theoretical-framework.}
+
+\subsubsection{Genetical Theory}\label{genetical-theory}
+
+From genetic theory we know that alleles A, B are dominant to allele O;
+alleles A, B are co-dominant; and allele O is recessive to alleles A, B.
+Using this below is a mapping from genotype to phenotype. Genotype
+Phenotype AA or AO - A BB or BO - B AB - AB OO - O
+
+\subsubsection{Hardy--Weinberg
+equilibrium.}\label{hardyweinberg-equilibrium.}
+
+Going from allele frequency to genotypic frequency and going from
+genotypic frequency to phenotypic frequency.
+
+he Hardy-Weinberg principle states that a population's allele and
+genotype frequencies will remain constant in the absence of evolutionary
+mechanisms. Ultimately, the Hardy-Weinberg principle models a population
+without evolution under the following conditions:
+
+no mutations no immigration/emigration no natural selection no sexual
+selection a large population Although no real-world population can
+satisfy all of these conditions, the principle still offers a useful
+model for population analysis.
+
+Hardy-Weinberg Equations and Analysis According to the Hardy-Weinberg
+principle, the variable p often represents the frequency of a particular
+allele, usually a dominant one. If p and q are the only two possible
+alleles for this characteristic, then the sum of the frequencies must
+add up to 1, or 100 percent. We can also write this as p + q = 1. If the
+frequency of the Y allele in the population is 0.6, then we know that
+the frequency of the y allele is 0.4.
+
+From the Hardy-Weinberg principle and the known allele frequencies, we
+can also infer the frequencies of the genotypes. Since each individual
+carries two alleles per gene (Y or y), we can predict the frequencies of
+these genotypes with a chi square. If two alleles are drawn at random
+from the gene pool, we can determine the probability of each genotype.
+
+The Hardy-Weinberg principle assumes that in a given population, the
+population is large and is not experiencing mutation, migration, natural
+selection, or sexual selection. The frequency of alleles in a population
+can be represented by p + q = 1, with p equal to the frequency of the
+dominant allele and q equal to the frequency of the recessive allele.
+The frequency of genotypes in a population can be represented by
+p2+2pq+q2= 1, with p2 equal to the frequency of the homozygous dominant
+genotype, 2pq equal to the frequency of the heterozygous genotype, and
+q2 equal to the frequency of the recessive genotype. The frequency of
+alleles can be estimated by calculating the frequency of the recessive
+genotype, then calculating the square root of that frequency in order to
+determine the frequency of the recessive allele.
+
+How reasonable is it to assume HWE.
+
+\subsubsection{Statistical Theory:}\label{statistical-theory}
+
+We have our log likelihood function:
+
+We can find the maxima's of this by taking the first derivative,
+equating to zero and then solving for p and q. However, this is very
+difficult to do analytically. Hence, we will use two different
+algorithms and approaches to estimate p and q. Namely, the
+Estimation-Maximization algorithm and the Newton-Raphson algorithm.
+
+\subsection{Estimation-Maximization Algorithm
+Method}\label{estimation-maximization-algorithm-method}
+
+One method to solving this is to think of the allele frequencies as
+latent variables or missing variables. In this approach we can cast the
+problem in the framework of EM algorithm.
+
+To implement the EM algorithm we reframe the question in terms of a
+missing data problem.
+
+\subsection{Newton-Raphson Algorithm
+Method}\label{newton-raphson-algorithm-method}
+
+The other method is a more direct method where we directly find the
+maxima's of the loglikelihood function using numeric computational
+method called Newton-Raphson algorithm.
+
+To approximate the values of \(\hat{p}, \hat{q}.\)
+
+We have the log-likelihood function
+
+\[ln(L) \sim n_\text{a}\ln\left(p^2+2\left(-p q+1\right)p\right)+n_\text{ab}\ln\left(2qp\right)+2n_\text{o}\ln\left(-p-q+1\right)+n_\text{b}\ln\left(2q\left(-p-q+1\right)+q^2\right)
+\]
+
+Using the properties of log we can be simplified to the following:
+
+\[ln(L) \sim n_\text{b}\ln\left(-q\left(2p+q-2\right)\right)+n_\text{a}\ln\left(-p\left(p+2q-2\right)\right)+n_\text{ab}\ln\left(2qp\right)+2n_\text{o}\ln\left(-p-q+1\right)
+\]
+
+We need to get the full first derivative of this with respect to p and
+q.
+
+We find that the derivative with respect to p is df/dp:
+
+\[ \frac{\partial f}{\partial p } = \dfrac{2n_\text{b}}{2p+q-2}+n_\text{a}\left(\dfrac{1}{p+2q-2}+\dfrac{1}{p}\right)+\dfrac{n_\text{ab}}{p}-\dfrac{2n_\text{o}}{-p-q+1}
+\]
+
+The first derivative with respect to q is df/dq:
+
+\[\frac{\partial f}{\partial q } = \dfrac{2n_\text{a}}{2q+p-2}+n_\text{b}\left(\dfrac{1}{q+2p-2}+\dfrac{1}{q}\right)+\dfrac{n_\text{ab}}{q}-\dfrac{2n_\text{o}}{-q-p+1}
+\]
+
+The second derivatives which are the components of the hessian are as
+follows:
+
+ddfpp
+
+\[ \frac{\partial^2 f}{\partial p^2} = -\dfrac{4n_\text{b}}{\left(2p+q-2\right)^2}+n_\text{a}\left(-\dfrac{1}{\left(p+2q-2\right)^2}-\dfrac{1}{p^2}\right)-\dfrac{n_\text{ab}}{p^2}-\dfrac{2n_\text{o}}{\left(-p-q+1\right)^2}
+\]
+
+ddfqp
+
+\[\frac{\partial^2 f}{\partial q \partial p } = -\dfrac{2n_\text{b}}{\left(2p+q-2\right)^2}-\dfrac{2n_\text{a}}{\left(p+2q-2\right)^2}-\dfrac{2n_\text{o}}{\left(-p-q+1\right)^2}
+\]
+
+ddfqq
+
+\[ \frac{\partial^2 f}{\partial q^2} = -\dfrac{4n_\text{a}}{\left(2q+p-2\right)^2}+n_\text{b}\left(-\dfrac{1}{\left(q+2p-2\right)^2}-\dfrac{1}{q^2}\right)-\dfrac{n_\text{ab}}{q^2}-\dfrac{2n_\text{o}}{\left(-q-p+1\right)^2}
+\]
+
+ddfpq
+
+\[\frac{\partial^2 f}{\partial p \partial q } =-\dfrac{2n_\text{b}}{\left(2p+q-2\right)^2}-\dfrac{2n_\text{a}}{\left(p+2q-2\right)^2}-\dfrac{2n_\text{o}}{\left(-p-q+1\right)^2}
+\]
+
+\subsection{Data}\label{data}
+
+\section{Analysis and Results.}\label{analysis-and-results.}
+
+\subsection{Newton-Raphson Algorithm}\label{newton-raphson-algorithm}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# Data}
+
+\NormalTok{n_A =}\StringTok{ }\DecValTok{9123}
+\NormalTok{n_B =}\StringTok{ }\DecValTok{2987}
+\NormalTok{n_AB =}\StringTok{ }\DecValTok{1269}
+\NormalTok{n_O =}\StringTok{ }\DecValTok{7725}
+\NormalTok{n =}\StringTok{ }\NormalTok{n_A }\OperatorTok{+}\StringTok{ }\NormalTok{n_B }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB }\OperatorTok{+}\StringTok{ }\NormalTok{n_O}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{# The log likelihood function,}
+
+\NormalTok{loglikf =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p, q) \{}
+
+\NormalTok{  f =}\StringTok{ }\NormalTok{n_A }\OperatorTok{*}\StringTok{ }\KeywordTok{log}\NormalTok{(p}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_B}\OperatorTok{*}\KeywordTok{log}\NormalTok{(q}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\NormalTok{−p−q)) }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB}\OperatorTok{*}\KeywordTok{log}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{q) }\OperatorTok{+}\StringTok{ }\NormalTok{n_O}\OperatorTok{*}\KeywordTok{log}\NormalTok{((}\DecValTok{1}\NormalTok{−p−q)}\OperatorTok{^}\DecValTok{2}\NormalTok{)}
+
+  \KeywordTok{return}\NormalTok{(f)}
+\NormalTok{\}}
+
+\CommentTok{# Function that calculates the full first derivative. }
+
+\NormalTok{Df =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p, q)\{}
+  
+\NormalTok{  dfp =}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_B)}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{+}\NormalTok{q}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{+}\NormalTok{n_A}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\NormalTok{(p}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{+}\DecValTok{1}\OperatorTok{/}\NormalTok{p)}\OperatorTok{+}\NormalTok{n_AB}\OperatorTok{/}\NormalTok{p}\OperatorTok{-}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_O)}\OperatorTok{/}\NormalTok{(}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q}\OperatorTok{+}\DecValTok{1}\NormalTok{)}
+  
+\NormalTok{  dfq =}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_A)}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{+}\NormalTok{p}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{+}\NormalTok{n_B}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{/}\NormalTok{(q}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{+}\DecValTok{1}\OperatorTok{/}\NormalTok{q)}\OperatorTok{+}\NormalTok{n_AB}\OperatorTok{/}\NormalTok{q}\OperatorTok{-}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_O)}\OperatorTok{/}\NormalTok{(}\OperatorTok{-}\NormalTok{q}\OperatorTok{-}\NormalTok{p}\OperatorTok{+}\DecValTok{1}\NormalTok{)}
+  
+  \KeywordTok{return}\NormalTok{( }\KeywordTok{c}\NormalTok{(dfp, dfq) )}
+\NormalTok{\}}
+
+\CommentTok{# Function that calculates the Hessian.}
+
+\NormalTok{DDf =}\StringTok{ }\ControlFlowTok{function}\NormalTok{(p, q) \{}
+  
+\NormalTok{    d2fpp =}\StringTok{ }\OperatorTok{-}\NormalTok{(}\DecValTok{4}\OperatorTok{*}\NormalTok{n_B)}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{+}\NormalTok{q}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\NormalTok{n_A}\OperatorTok{*}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\OperatorTok{/}\NormalTok{(p}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{^}\DecValTok{2}\OperatorTok{-}\DecValTok{1}\OperatorTok{/}\NormalTok{p}\OperatorTok{^}\DecValTok{2}\NormalTok{)}\OperatorTok{-}\NormalTok{n_AB}\OperatorTok{/}\NormalTok{p}\OperatorTok{^}\DecValTok{2}\OperatorTok{-}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_O)}\OperatorTok{/}\NormalTok{(}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q}\OperatorTok{+}\DecValTok{1}\NormalTok{)}\OperatorTok{^}\DecValTok{2}
+\NormalTok{    a =}\StringTok{ }\NormalTok{d2fpp}
+    
+\NormalTok{    d2fqp =}\StringTok{ }\OperatorTok{-}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_A)}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{+}\NormalTok{p}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{^}\DecValTok{2}\OperatorTok{-}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_B)}\OperatorTok{/}\NormalTok{(q}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{^}\DecValTok{2}\OperatorTok{-}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_O)}\OperatorTok{/}\NormalTok{(}\OperatorTok{-}\NormalTok{q}\OperatorTok{-}\NormalTok{p}\OperatorTok{+}\DecValTok{1}\NormalTok{)}\OperatorTok{^}\DecValTok{2}
+\NormalTok{    c =}\StringTok{ }\NormalTok{d2fqp    }
+    
+\NormalTok{    d2fqq =}\StringTok{ }\OperatorTok{-}\NormalTok{(}\DecValTok{4}\OperatorTok{*}\NormalTok{n_A)}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{+}\NormalTok{p}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{^}\DecValTok{2}\OperatorTok{+}\NormalTok{n_B}\OperatorTok{*}\NormalTok{(}\OperatorTok{-}\DecValTok{1}\OperatorTok{/}\NormalTok{(q}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{^}\DecValTok{2}\OperatorTok{-}\DecValTok{1}\OperatorTok{/}\NormalTok{q}\OperatorTok{^}\DecValTok{2}\NormalTok{)}\OperatorTok{-}\NormalTok{n_AB}\OperatorTok{/}\NormalTok{q}\OperatorTok{^}\DecValTok{2}\OperatorTok{-}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_O)}\OperatorTok{/}\NormalTok{(}\OperatorTok{-}\NormalTok{q}\OperatorTok{-}\NormalTok{p}\OperatorTok{+}\DecValTok{1}\NormalTok{)}\OperatorTok{^}\DecValTok{2}
+\NormalTok{    d =}\StringTok{ }\NormalTok{d2fqq}
+    
+\NormalTok{    d2fpq =}\StringTok{ }\OperatorTok{-}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_B)}\OperatorTok{/}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{+}\NormalTok{q}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{^}\DecValTok{2}\OperatorTok{-}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_A)}\OperatorTok{/}\NormalTok{(p}\OperatorTok{+}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{-}\DecValTok{2}\NormalTok{)}\OperatorTok{^}\DecValTok{2}\OperatorTok{-}\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n_O)}\OperatorTok{/}\NormalTok{(}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q}\OperatorTok{+}\DecValTok{1}\NormalTok{)}\OperatorTok{^}\DecValTok{2}
+\NormalTok{    b =}\StringTok{ }\NormalTok{d2fpq}
+    
+\NormalTok{    H =}\StringTok{ }\KeywordTok{matrix}\NormalTok{( }\KeywordTok{c}\NormalTok{(a, b, c, d), }\DataTypeTok{nrow =} \DecValTok{2}\NormalTok{)}
+    
+    \KeywordTok{return}\NormalTok{(H)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{p_NN =}\StringTok{ }\DecValTok{0}
+\NormalTok{q_NN =}\StringTok{ }\DecValTok{0}
+
+\NormalTok{p0 =}\StringTok{ }\NormalTok{.}\DecValTok{34}
+\NormalTok{q0 =}\StringTok{ }\NormalTok{.}\DecValTok{34}
+
+\CommentTok{# p0 + q0 < 1}
+
+\NormalTok{x0 =}\StringTok{ }\KeywordTok{c}\NormalTok{(p0, q0)}
+
+\NormalTok{NN =}\StringTok{ }\DecValTok{100}
+
+\CommentTok{#while( !( abs(p_N[i+1] - p_N[i]) < eps1 & abs(q_N[i+1] - q_N[i]) < eps2) | i < N) \{}
+
+\ControlFlowTok{for}\NormalTok{ (j }\ControlFlowTok{in} \DecValTok{1}\OperatorTok{:}\NormalTok{NN) \{}
+
+\NormalTok{  p_NN[j] =}\StringTok{ }\NormalTok{x0[}\DecValTok{1}\NormalTok{]}
+\NormalTok{  q_NN[j] =}\StringTok{ }\NormalTok{x0[}\DecValTok{2}\NormalTok{]}
+
+\NormalTok{  x1 =}\StringTok{ }\NormalTok{x0 }\OperatorTok{-}\StringTok{ }\KeywordTok{solve}\NormalTok{(}\KeywordTok{DDf}\NormalTok{(x0[}\DecValTok{1}\NormalTok{], x0[}\DecValTok{2}\NormalTok{])) }\OperatorTok{%*%}\StringTok{ }\KeywordTok{Df}\NormalTok{(x0[}\DecValTok{1}\NormalTok{], x0[}\DecValTok{2}\NormalTok{])}
+
+\CommentTok{# 2x1  2X1              2x2                      2x1}
+
+  \CommentTok{#if( )}
+
+\NormalTok{  x0 =}\StringTok{ }\NormalTok{x1}
+  \CommentTok{#print(j)}
+  \CommentTok{#print(x0)}
+
+\NormalTok{\}}
+
+\KeywordTok{print}\NormalTok{(x0)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##           [,1]
+## [1,] 0.2876856
+## [2,] 0.1065550
+\end{verbatim}
+
+\subsection{EM Algorithm}\label{em-algorithm}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{n_A =}\StringTok{ }\DecValTok{9123}
+\NormalTok{n_B =}\StringTok{ }\DecValTok{2987}
+\NormalTok{n_AB =}\StringTok{ }\DecValTok{1269}
+\NormalTok{n_O =}\StringTok{ }\DecValTok{7725}
+\NormalTok{n =}\StringTok{ }\NormalTok{n_A }\OperatorTok{+}\StringTok{ }\NormalTok{n_B }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB }\OperatorTok{+}\StringTok{ }\NormalTok{n_O}
+
+\CommentTok{# Starting estimates}
+
+\NormalTok{p_N =}\StringTok{ }\DecValTok{0}
+\NormalTok{q_N =}\StringTok{ }\DecValTok{0}
+
+\NormalTok{p =}\StringTok{ }\NormalTok{.}\DecValTok{6}
+\NormalTok{q =}\StringTok{ }\NormalTok{.}\DecValTok{6}
+
+\NormalTok{p =}\StringTok{ }\NormalTok{.}\DecValTok{34}
+\NormalTok{q =}\StringTok{ }\NormalTok{.}\DecValTok{34}
+
+\NormalTok{p_N[}\DecValTok{2}\NormalTok{] =}\StringTok{ }\NormalTok{p}
+\NormalTok{q_N[}\DecValTok{2}\NormalTok{] =}\StringTok{ }\NormalTok{q}
+
+\NormalTok{N =}\StringTok{ }\DecValTok{500} \CommentTok{# Number of max iterations.}
+\NormalTok{i =}\StringTok{ }\DecValTok{1}
+\NormalTok{eps1 =}\StringTok{ }\NormalTok{.}\DecValTok{00005}
+\NormalTok{eps2 =}\StringTok{ }\NormalTok{.}\DecValTok{00005}
+
+\CommentTok{# 2 assumptions: hwe and }
+
+\ControlFlowTok{while}\NormalTok{( }\OperatorTok{!}\NormalTok{( }\KeywordTok{abs}\NormalTok{(p_N[i}\OperatorTok{+}\DecValTok{1}\NormalTok{] }\OperatorTok{-}\StringTok{ }\NormalTok{p_N[i]) }\OperatorTok{<}\StringTok{ }\NormalTok{eps1 }\OperatorTok{&}\StringTok{ }\KeywordTok{abs}\NormalTok{(q_N[i}\OperatorTok{+}\DecValTok{1}\NormalTok{] }\OperatorTok{-}\StringTok{ }\NormalTok{q_N[i]) }\OperatorTok{<}\StringTok{ }\NormalTok{eps2) }\OperatorTok{|}\StringTok{ }\NormalTok{i }\OperatorTok{<}\StringTok{ }\NormalTok{N) \{ }
+      
+        \CommentTok{# Expectation Step}
+      
+\NormalTok{        E_nAA =}\StringTok{ }\NormalTok{n_A }\OperatorTok{*}\StringTok{ }\NormalTok{( (p}\OperatorTok{^}\DecValTok{2}\NormalTok{) }\OperatorTok{/}\StringTok{ }\NormalTok{( p}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q) ) )}
+\NormalTok{        E_nAO =}\StringTok{ }\NormalTok{n_A }\OperatorTok{*}\StringTok{ }\NormalTok{( (}\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q)) }\OperatorTok{/}\StringTok{ }\NormalTok{( p}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q) ) )}
+\NormalTok{        E_nBB =}\StringTok{ }\NormalTok{n_B }\OperatorTok{*}\StringTok{ }\NormalTok{( (q}\OperatorTok{^}\DecValTok{2}\NormalTok{) }\OperatorTok{/}\StringTok{ }\NormalTok{( p}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q) ) )}
+\NormalTok{        E_nBO =}\StringTok{ }\NormalTok{n_B }\OperatorTok{*}\StringTok{ }\NormalTok{( (}\DecValTok{2}\OperatorTok{*}\NormalTok{q}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q)) }\OperatorTok{/}\StringTok{ }\NormalTok{( p}\OperatorTok{^}\DecValTok{2} \OperatorTok{+}\StringTok{ }\DecValTok{2}\OperatorTok{*}\NormalTok{p}\OperatorTok{*}\NormalTok{(}\DecValTok{1}\OperatorTok{-}\NormalTok{p}\OperatorTok{-}\NormalTok{q) ) )}
+        
+        \CommentTok{# Maximization step}
+        
+\NormalTok{        p =}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\StringTok{ }\NormalTok{E_nAA }\OperatorTok{+}\StringTok{ }\NormalTok{E_nAO }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB) }\OperatorTok{/}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n) }
+\NormalTok{        q =}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\StringTok{ }\NormalTok{E_nBB }\OperatorTok{+}\StringTok{ }\NormalTok{E_nBO }\OperatorTok{+}\StringTok{ }\NormalTok{n_AB) }\OperatorTok{/}\StringTok{ }\NormalTok{(}\DecValTok{2}\OperatorTok{*}\NormalTok{n)}
+        
+\NormalTok{        p_N[i}\OperatorTok{+}\DecValTok{2}\NormalTok{] =}\StringTok{ }\NormalTok{p}
+\NormalTok{        q_N[i}\OperatorTok{+}\DecValTok{2}\NormalTok{] =}\StringTok{ }\NormalTok{q}
+      
+\NormalTok{        i =}\StringTok{ }\NormalTok{i }\OperatorTok{+}\StringTok{ }\DecValTok{1}
+  
+\NormalTok{\}}
+
+\KeywordTok{print}\NormalTok{(i)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 500
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{print}\NormalTok{(p)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.2835973
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{print}\NormalTok{(q)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 0.03845067
+\end{verbatim}
+
+\section{Discussion}\label{discussion}
+
+\subsection{Comparing Algorithm Speed and
+Efficiency.}\label{comparing-algorithm-speed-and-efficiency.}
+
+\subsection{Comparing Algorithms' robustness to initial
+vaules.}\label{comparing-algorithms-robustness-to-initial-vaules.}
+
+\subsection{}\label{section}
+
+\section{References}\label{references}
+
+
+\end{document}

@@ -1,0 +1,389 @@
+\documentclass[10pt]{beamer}
+\usetheme{Madrid}
+\usepackage{hyperref}
+\usepackage{color}
+\usepackage{amssymb}
+\usepackage{pifont}
+%\usepackage{graphicx}
+%\setbeamertemplate{itemize item}{\scriptsize\raise1.25pt\hbox{\donotcoloroutermaths$\blacktriangleright$}}
+\setbeamertemplate{itemize item}{\ding{224}}
+\setbeamertemplate{itemize subitem}{\scriptsize \ding{117}}
+\setbeamertemplate{itemize subsubitem}{\tiny \raise1.25pt\hbox{\ding{107}}}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\subtitle[Fundamentals of Statistical Genetics] {(Fundamentals of) Statistical Genetics}
+\title{Module 3.2 - Missing Data and EM Algorithm}
+\author{Lei Sun}
+\date{}
+\institute[University of Toronto]
+{Department of Statistical Sciences, FAS \\Division of Biostatistics, DLSPH\\ University of Toronto} 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\frame{ \titlepage}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Outline}
+
+\begin{itemize}
+\item Allele frequency estimation - the ABO-blood type example 
+\item Missing data issue 
+\item An approximated solution 
+\item Iterative algorithms 
+\begin{itemize}
+\item The Newton-Raphson algorithm
+\item The EM algorithm 
+\end{itemize}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{The ABO-Blood Type Example} 
+\begin{itemize}
+
+\item The ABO-gene or ABO-locus is on chromosome 9
+\item It has 3 alleles (antigens) (A, B, O) 
+\item And it determines  4 blood type (A, B, AB, O):
+
+{\small
+\begin{verbatim}
+  
+   genotype   phenotype
+    AA  AO       A
+    BB  BO       B
+      AB         AB
+      OO         O  
+
+  A, B  are dominant to O.
+  O     is recessive to A, B.
+  A, B  are co-dominant.
+
+\end{verbatim}
+}
+\pagebreak
+
+\item E.g.\ in a large random sample obtained from Berlin (Bernstein 1925, Sham's book page 44):
+\begin{itemize}
+\item $n_A=9123$ blood type A 
+\item $n_B=2987$ blood type B 
+\item $n_{AB}=1269$ blood type AB
+\item $n_O=7725$ blood type O
+\end{itemize}
+\bigskip
+
+\item How to estimate the allele frequencies of alleles A, B and O \\
+(or even just to estimate the genotype frequencies of genotypes AA, AO, etc)? 
+\end{itemize}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]
+\frametitle{The Missing Data Problem} 
+
+\begin{itemize}
+\item 6 possible genotypes, but only 4 phenotypically distinguishable.
+\begin{itemize}
+\item Phenotype may be directly measured (e.g. blood type, height etc).
+\item Genotype may not be observed.
+\end{itemize}
+\bigskip
+
+\item Problem with the direct counting method: missing data w.r.t$.$ the count of each of the 6 genotypes: $n_{AA}, n_{AO}, n_{BB}, n_{BB}, n_{AB}, n_{OO}$!
+\begin{itemize}
+\item $n_A=9123=n_{AA}+n_{AO}$: Among 9123 blood type A individuals, some have genotype AA and the others have genotype AO.
+
+\item $n_B=2987=n_{BB}+n_{BO}$:  Among 2987 blood type B individuals, some have genotype BB and the others have genotype BO.
+\end{itemize}
+\bigskip
+
+\item So we need a more statistical approach.  
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Notation and Likelihood} 
+
+\begin{itemize}
+
+\item Let
+{\small
+$$p=freq(\mbox{allele } A),$$
+$$q=freq(\mbox{allele } B),$$
+$$1-p-q=freq(\mbox{allele } O).$$
+}
+
+\item Assuming HWE, frequencies of 6 genotypes:
+{\small
+$$freq(AA)=p^2, \: \:  freq(AO)=2p(1-p-q),$$
+$$freq(BB)=q^2, \: \: freq(BO)=2q(1-p-q),$$
+$$freq(AB)=2pq, \: \: freq(OO)=(1-p-q)^2.$$
+}
+
+\item Therefore, frequencies of 4 phenotypes:
+{\small
+$$freq(A)=p^2+2p(1-p-q),$$
+$$freq(B)=q^2+2q(1-p-q),$$
+$$freq(AB)=2pq,$$
+$$freq(O)=(1-p-q)^2.$$
+}
+\pagebreak
+
+\item The log-likelihood is
+
+\begin{align*}
+lnL(p,q) \sim& \mbox{ } n_A ln(p^2+2p(1-p-q))\\
+&+n_Bln(q^2+2q(1-p-q))\\
+& +n_{AB} ln(2pq)\\
+& + n_O ln((1-p-q)^2)\\
+\end{align*}
+
+\item Take the partial derivatives of this log-likelihood function, set them to be 0 and solve the equations: MLEs.\\
+\smallskip
+\centerline{No closed formed solutions!}
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{Approximation} 
+
+Bernstein (1925) gave an approximate solution based on groupings of phenotypes. 
+\bigskip
+
+\begin{itemize}
+\item Expected frequencies of blood type A or O:
+$$freq(A, O)=p^2+2p(1-p-q)+(1-p-q)^2=(1-q)^2.$$
+\smallskip
+\item Expected frequencies of blood type B or O:
+$$freq(B, O)=q^2+2q(1-p-q)+(1-p-q)^2=(1-p)^2.$$
+\smallskip
+\item Let $n=n_A+n_B+n_{AB}+n_O$.
+\pagebreak
+\item Observed frequencies of blood type A or O:
+$$(n_A+n_O)/n=16848/21104=0.7983.$$
+\item Observed frequencies of blood type B or O:
+$$(n_B+n_O)/n=10712/21104=0.5076.$$
+\smallskip
+\item The approximate estimates would be:
+$$(1-q)^2=0.7983 \Rightarrow \tilde q = 1-\sqrt{0.7983}=0.106506,$$
+
+$$(1-p)^2=0.5076 \Rightarrow \tilde p = 1-\sqrt{0.5076}=0.287552.$$
+\bigskip
+
+\item Alternatively, the Newton-Raphson and EM algorithms can be used.
+\end{itemize}
+
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{The Newton-Raphson Algorithm}
+ 
+\begin{itemize}
+
+\item A numerical iterative approach to obtain the maximum (or the minimum) a function: $f(\vec \theta)$, $(\vec \theta \in R^n)$, e.g.
+$$f(\vec \theta) = lnL(p,q) = f(p,q)$$
+\smallskip
+
+\item It is based on the first derivatives (gradient vector), e.g.\\
+ 
+\[ f'(\vec \theta) = f'(p,q) = 
+\left[ \begin{array}{c} 
+\frac{\partial{f(p,q)}}{\partial{p}}\\
+\frac{\partial{f(p,q)}}{\partial{q}}
+\end{array} \right] \]
+\bigskip
+
+and the second derivatives (Hessian matrix), e.g.\\
+
+\[ f''(\vec \theta) = f''(p,q) = 
+\left[ \begin{array}{cc} 
+\frac{\partial^2 {f(p,q)}}{{\partial{p}}^2}&
+\frac{\partial^2 {f(p,q)}}{\partial{p}\partial{q}}\\
+\frac{\partial^2 {f(p,q)}}{\partial{q}\partial{p}}&
+\frac{\partial^2 {f(p,q)}}{{\partial{q}}^2}
+\end{array} \right] \]
+\bigskip
+
+\item The algorithm is such:
+
+\begin{itemize}
+
+\item Choose a starting value, $\vec \theta ^{(0)}$. 
+
+\item For $k=1,2,...$ the updating function is
+
+$$\vec \theta^{(k)} = \vec \theta^{(k-1)} 
+- [f''(\vec \theta^{(k-1)})]^{-1} f'(\vec \theta^{(k-1)})$$  
+\bigskip
+
+\item Under certain conditions, $\{\vec \theta^{(k)}\}$ converges to the value that maximizes (or minimizes) the function. 
+\end{itemize}
+\pagebreak
+
+\item A few notes on the Newton-Raphson algorithm. \\
+
+\begin{itemize}
+
+\item The staring value, $\vec \theta ^{(0)}$, is important: the algorithm is not guaranteed to converge from all starting values, particularly in regions where the matrix $- [f''(\vec \theta^{(k-1)})]$ is no positive definite. \\
+
+(Staring values may be obtained from some crude parameter estimates.) 
+\smallskip
+
+\item The advantage of Newton's method is: once the iterates are close to the solution, convergence is extremely fast.
+\smallskip
+
+\item If the iterations do not converge: they typically  move off quickly toward the edge of the parameter space. \\
+
+(The remedy can be trying again with a new staring point.) 
+\smallskip
+
+\item The computational load can be heavy, if the number of parameters is large, because of the inverse of the Hessian matrix. 
+
+\end{itemize}
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[fragile,allowframebreaks]
+\frametitle{The EM Algorithm}
+ 
+\begin{itemize}
+
+\item The Expectation-Maximization (EM) algorithm is a numerical iterative method for finding the Maximum Likelihood Estimates (MLE) of parameters. 
+\smallskip
+
+\item EM algorithms are often used in situations where the problem of estimation can be solved much easier if certain additional pieces of data are available. 
+\pagebreak
+
+\item The ABO-blood problem can be formulated as such incomplete data or missing data problem: 
+\begin{itemize}
+
+\item Some of the  counts of the 6 genotypes are missing:\\
+among blood type A: $n_{A}=n_{AA}+n_{AO}$,\\
+among blood type B: $n_{B}=n_{BB}+n_{BO}$.
+\smallskip
+
+\item Complete data:\\
+$n_{AA}$, $n_{AO}$, $n_{BB}$, $n_{BO}$, $n_{AB}$, $n_{OO}$.
+\smallskip
+
+\item Observed data:\\
+$n_A=n_{AA}+n_{AO}$, $n_B=n_{BB}+n_{BO}$,
+$n_{AB}=n_{AB}$, $n_{O}=n_{OO}$.
+\smallskip
+
+\item Missing data:\\
+$n_{AA}$ or $n_{AO}$, $n_{BB}$ or $n_{BO}$.
+\end{itemize}
+\bigskip
+
+\item Parameters of interest:
+$p=freq(\mbox{allele } A)$ and 
+$q=freq(\mbox{allele } B)$.
+\pagebreak
+
+
+\item E-step: the expected value of the log likelihood is calculated (when the log likelihood is linear w.r.t. to the missing data as in this case, then essentially, the missing data are imputed), assuming some initial values for the parameters, e.g. given the initial parameter values $p^{(0)}$, $q^{(0)}$:\\
+\bigskip
+
+{\small
+$E[n_{AA}] = \frac{freq(AA)}{freq(AA)+freq(AO)} n_A $\\
+\hspace*{1.8cm}
+$=\frac{p^{(0)}p^{(0)}}{p^{(0)}p^{(0)}+2p^{(0)}(1-p^{(0)}-q^{(0)})} n_A = n_{AA}^{(0)}$ \\
+\bigskip
+
+$E[n_{AO}] = n_A-n_{AA} = \frac{freq(AO)}{freq(AA)+freq(AO)} n_A$\\
+\hspace*{1.8cm}
+$=\frac{2p^{(0)}(1-p^{(0)}-q^{(0)})}{p^{(0)}p^{(0)}+2p^{(0)}(1-p^{(0)}-q^{(0)})} n_A = n_{AO}^{(0)}$ \\
+\bigskip
+\bigskip
+
+$E[n_{BB}] = \frac{freq(BB)}{freq(BB)+freq(BO)} n_B $\\
+\hspace*{1.8cm}
+$=\frac{q^{(0)}q^{(0)}}{q^{(0)}q^{(0)}+2q^{(0)}(1-p^{(0)}-q^{(0)})} n_B = n_{BB}^{(0)}$ \\
+\bigskip
+
+$E[n_{BO}] = n_B-n_{BB} = \frac{freq(BO)}{freq(BB)+freq(BO)} n_B$\\
+\hspace*{1.8cm}
+$=\frac{2q^{(0)}(1-p^{(0)}-q^{(0)})}{q^{(0)}q^{(0)}+2q^{(0)}(1-p^{(0)}-q^{(0)})} n_B = n_{BO}^{(0)}$ \\
+}
+\pagebreak
+
+\item M-step: MLE can then be calculated based on 
+\centerline{imputed missing data + observed data = complete data}
+\smallskip
+
+e.g. MLE of the parameters of interest, $p$ and $q$, given the imputed missing data
+($n_{AA}^{(0)}$, $n_{AO}^{(0)}$, $n_{BB}^{(0)}$, $n_{BO}^{(0)}$), and
+ the observed data ($n_{AB}$, $n_{OO}$):
+
+$$p^{(1)} = \frac{2n_{AA}^{(0)}+n_{AO}^{(0)}+n_{AB}}{2n}$$
+
+$$q^{(1)} = \frac{2n_{BB}^{(0)}+n_{BO}^{(0)}+n_{AB}}{2n}$$
+\bigskip
+
+where $n=n_{A}+n_{B}+n_{AB}+n_{O}$, the total number of individuals in the sample.\\
+
+$p^{(1)}$ and $q^{(1)}$ are improved estimates of the parameters!
+\pagebreak
+
+\item Use $p^{(1)}$ and $q^{(1)}$ to perform the E-step again, and then perform the M-step to obtain improved estimates, 
+$p^{(2)}$ and $q^{(2)}$.
+\smallskip
+
+\item Continue until convergence: the changes in parameter estimates ($p^{(k)}-p^{(k-1)}$, $q^{(k)}-q^{(k-1)}$) are negligible for the purpose
+of the study.
+\bigskip
+
+\item A couple of comments on the EM algorithm: 
+\smallskip
+\begin{itemize}
+\item Under regular conditions, the algorithm converges to a local mode of the posterior density. 
+\smallskip
+\item The rate at which the EM algorithm converges depends on the proportion of missing ``information''. 
+\end{itemize}
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Exercises}
+
+\begin{itemize}
+
+\item \href{http://www.utstat.toronto.edu/sun/statgene-exercise/statgene-exercise-ABO-algorithms.pdf}{\textcolor{blue}{Implement the two algorithms}}.
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}[allowframebreaks]
+\frametitle{}
+
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\end{document}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}[allowframebreaks]
+\frametitle{}
+
+\begin{itemize}
+
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{columns}
+\begin{column}{2in}
+
+\end{column}
+\begin{column}{2in}
+
+\end{column}
+\end{columns}

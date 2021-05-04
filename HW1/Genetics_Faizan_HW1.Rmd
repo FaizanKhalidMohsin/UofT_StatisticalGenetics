@@ -1,0 +1,252 @@
+---
+title: "Statistical Genetics HW1"
+author: "Faizan Khalid Mohsin"
+date: "September 22, 2020"
+output:
+  pdf_document: default
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+
+# Introduction
+
+# Method
+
+We use two methods for approximating the allele frequencies: Expectation-Maximization method and Newton-Raphson method.
+
+
+## Expectation-Maximization
+
+To implement the EM algorithm we reframe the question in terms of a missing data problem. 
+
+
+## Newton-Raphson
+
+To approximate the values of 
+
+
+
+
+# Analysis and Results.
+
+## Newton-Raphson Algorithm
+
+
+
+```{r Data}
+
+
+# Data
+
+n_A = 9123
+n_B = 2987
+n_AB = 1269
+n_O = 7725
+n = n_A + n_B + n_AB + n_O
+
+```
+
+```{r }
+
+# The log likelihood function,
+
+l = function(p, q) {
+
+  f = n_A * log(p^2+2*p*(1−p−q)) + n_B*log(q^2+2*q*(1−p−q)) + n_AB*log(2*p*q) + n_O*log((1−p−q)^2)
+
+  return(f)
+}
+
+
+
+# Function that calculates the full first derivative. 
+
+Df = function(p, q){
+  
+  dfp =   ( n_A*(2 - 2*p - 2*q) / (p^2+2*p*(1−p−q)) )   
+        + (n_B * (-2*q) / (q^2+2*q*(1−p−q))) 
+        + (n_AB/p) 
+        + (-2*n_O / (1−p−q))
+  
+  dfq =   ( n_A*(2*p ) / (p^2+2*p*(1−p−q)) )   
+        + (n_B * (2 - 2*p - 2*q) / (q^2+2*q*(1−p−q))) 
+        + (n_AB/q) 
+        + (-2*n_O / (1−p−q))
+  
+  return( c(dfp, dfq) )
+}
+
+
+
+# Function that calculates the Hessian.
+
+DDf = function(p, q) {
+  
+    d2fpp = n_A * log(p^2+2*p*(1−p−q)) + n_B*log(q^2+2*q*(1−p−q)) + n_AB*log(2*p*q) + n_O*log((1−p−q)^2) 
+
+    a = d2fpp
+    
+    d2fqq = n_A * log(p^2+2*p*(1−p−q)) + n_B*log(q^2+2*q*(1−p−q)) + n_AB*log(2*p*q) + n_O*log((1−p−q)^2)
+
+    
+     d = d2fqq
+    
+    d2fpq = n_A * log(p^2+2*p*(1−p−q)) + n_B*log(q^2+2*q*(1−p−q)) + n_AB*log(2*p*q) + n_O*log((1−p−q)^2) 
+    
+     b = d2fpq
+
+    
+    d2fqp = n_A * log(p^2+2*p*(1−p−q)) + n_B*log(q^2+2*q*(1−p−q)) + n_AB*log(2*p*q) + n_O*log((1−p−q)^2) 
+    
+     c = d2fqp
+
+    H = matrix( c(a, b, c, d), nrow = 2)
+}
+
+#H = 2 x 2
+
+```
+
+
+
+```{r}
+# p_NN
+# q_NN
+# 
+# p0 = .1
+# q0 = .2
+# 
+# NN = 100
+# 
+# #while( !( abs(p_N[i+1] - p_N[i]) < eps1 & abs(q_N[i+1] - q_N[i]) < eps2) | i < N) {
+# 
+# for (i in 1:NN) {
+# 
+#   p_NN[i] = p0
+#   q_NN[i] = q0
+# 
+#   p1 = p0 - DDl(p0, q0) %*% Dl(p0, q0)  
+#   
+#    2x1     2X1          2x2          2x1
+# 
+# 
+# 
+#   #if( )
+# 
+# 
+#   p0 = p1
+#   q0 = q1
+# 
+# 
+# 
+# 
+# 
+# 
+# }
+
+
+```
+
+
+
+## EM Algorithm
+
+
+```{r}
+
+n_A = 9123
+n_B = 2987
+n_AB = 1269
+n_O = 7725
+n = n_A + n_B + n_AB + n_O
+
+
+# Starting estimates
+
+p_N = 0
+q_N = 0
+        
+E_nAA_N = 0
+E_nAO_N = 0
+E_nBB_N = 0
+E_nBO_N = 0
+
+p_N[2] = .6
+q_N[2] = .6
+        
+# E_nAA_N[2] = .5
+# E_nAO_N[2] = .5
+# E_nBB_N[2] = .5
+# E_nBO_N[2] = .5
+
+#for ( i in 1:N) {
+N = 100 # Number of max iterations.
+i = 1
+p = .6
+q = .6
+eps1 = .00005
+eps2 = .00005
+# 2 assumptions 
+
+while( !( abs(p_N[i+1] - p_N[i]) < eps1 & abs(q_N[i+1] - q_N[i]) < eps2) | i < N) { 
+      
+        # Expectation Step
+      
+        E_nAA = n_A * ( (p^2) / ( p^2 + 2*p*(1-p-q) ) )
+        E_nAO = n_A * ( (2*p*(1-p-q)) / ( p^2 + 2*p*(1-p-q) ) )
+        E_nBB = n_B * ( (q^2) / ( p^2 + 2*p*(1-p-q) ) )
+        E_nBO = n_B * ( (2*q*(1-p-q)) / ( p^2 + 2*p*(1-p-q) ) )
+        
+        
+        # Maximization step
+        
+        p = (2* E_nAA + E_nAO + n_AB) / (2*n) 
+        q = (2* E_nBB + E_nBO + n_AB) / (2*n)
+        
+        # print(paste("i: ", i))
+        # print(paste("p:", p, "q:", q))
+        
+        # Store the values
+        
+        p_N[i+2] = p
+        q_N[i+2] = q
+        
+        # E_nAA_N[i+2] = E_nAA
+        # E_nAO_N[i+2] = E_nAO
+        # E_nBB_N[i+2] = E_nBB
+        # E_nBO_N[i+2] = E_nBO
+        
+        #df = data.frame()
+        
+        i = i + 1
+  
+}
+
+
+print(p)
+print(q)
+
+```
+
+
+
+
+
+```{r}
+
+
+
+```
+
+
+# Discussion
+
+## Comparing Algorithm Speed and Efficiency. 
+
+
+
